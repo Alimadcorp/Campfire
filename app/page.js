@@ -133,7 +133,7 @@ export default function Home() {
             Organized by Teenagers in Lahore
           </p>
           <a
-            href="https://forms.hackclub.com/t/a3QSt8MuvHus"
+            href="https://forms.hackclub.com/campfire-signup?event=rec5bXfCOC93cGPBe"
             className="hc-button rounded-2xl font-primary text-[#8d3f34] px-6 py-3 text-3xl"
           >
             RSVP Now
