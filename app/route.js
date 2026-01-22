@@ -1,4 +1,10 @@
-function Letter() {
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  return NextResponse.redirect('https://campfire.hackclub.com/lahore', 307);
+}
+
+/*function Letter() {
   return (
     <div className="grid grid-cols-1 gap-3">
       <p className="font-bold text-3xl">Dear Hackers, Students, and Artists,</p>
@@ -285,4 +291,4 @@ export default function Home() {
       </div>
     </div>
   );
-}
+}*/
