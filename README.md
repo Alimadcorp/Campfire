@@ -14,9 +14,9 @@ This is the organizers portal
 `/login`
 
   - login with Slack auth (for organizers), slack app token is already saved as SLACK_CLIENT_ID, SLACK_CLIENT_SECRET
-  - required scopes: profile.read
+  - required scopes: all profile scopes
 
-`/api/auth/:callback`
+`/api/auth/callback/slack`
 
   - auth callbacks
 
