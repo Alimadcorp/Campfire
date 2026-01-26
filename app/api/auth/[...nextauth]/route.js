@@ -1,6 +1,8 @@
 import NextAuth from "next-auth"
 import SlackProvider from "next-auth/providers/slack"
 
+const isProduction = process.env.NODE_ENV === "production"
+
 export const authOptions = {
   trustHost: true,
   providers: [
@@ -14,12 +16,12 @@ export const authOptions = {
   },
   cookies: {
     sessionToken: {
-      name: "__Secure-next-auth.session-token",
+      name: isProduction ? "__Secure-next-auth.session-token" : "next-auth.session-token",
       options: {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: true
+        secure: isProduction
       }
     }
   },

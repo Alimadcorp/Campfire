@@ -10,10 +10,47 @@ export default async function Dash() {
   const user = session.user
 
   const orgs = {
-    "U0A9FR997HU": { note: "hi there raham imma eat u up" }
+    "U08LQFRBL6S": {
+      role: "PoC",
+      note: "hi there sir Alimad the great"
+    },
+    "U09DRCKD0LT": {
+      role: "Lead Sponsor & Outreach",
+      note: "hi there raham imma eat u up"
+    },
+    "U09DTPWN726": {
+      role: "Logistics",
+      note: "hi there abdullah. you little feminist"
+    },
+    "U07UGRYER5G": {
+      role: "Workshop",
+      note: "hi there sir umar the great :salute:"
+    },
+    "U08LQFRBL6S": {
+      role: "The Email",
+      note: "welcome to campfire, mister.... campfire-"
+    },
+    "U0AAS97SZU3": {
+      role: "The Developer",
+      note: "hi there fellow dev"
+    },
+    "U096NBE52JD": {
+      role: "Sponsors",
+      note: "hi there Momina!"
+    },
+    "U08RS7AEA77": {
+      role: "Branding & Outreach",
+      note: "hi there miss Aamina!"
+    },
+    "default": {
+      role: "Hacker",
+      note: "Welcome to Campfire Lahore! You are not registered as dev sorry :<"
+    }
   }
 
-  const userNote = orgs[user.slackId]?.note || null;
+  const userData = orgs[user.slackId] || orgs["default"]
+  const userNote = userData.note
+  const userRole = userData.role
 
-  return <DashboardClient user={user} note={userNote} />
+  return <DashboardClient user={user} note={userNote} role={userRole} />
 }
