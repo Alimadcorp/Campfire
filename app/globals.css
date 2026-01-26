@@ -24,6 +24,10 @@
     font-family: var(--font-serif, Arial, Helvetica, sans-serif);
   }
 
+  button {
+    cursor: pointer;
+  }
+
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--secondary) transparent;
