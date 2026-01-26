@@ -46,7 +46,7 @@ export default function DeviceMonitor({ deviceData, disconnected, appIcon, conne
                             <p className="text-xs uppercase tracking-widest opacity-60 mb-2 font-bold font-primary">Active App</p>
                             <div className="flex items-center gap-3">
                                 {appIcon && (
-                                    <img src={"data:image/png;base64," + appIcon} className="w-8 h-8 rounded-lg shadow-sm" alt="" />
+                                    <img src={"data:image/png;base64," + appIcon} className="w-8 h-8 rounded-lg shadow-sm" alt="app icon :P" key={deviceData.app + deviceData.timestamp} />
                                 )}
                                 <p className="font-subheading text-xl font-bold truncate">{deviceData.app || "Unknown"}</p>
                             </div>
@@ -74,7 +74,7 @@ export default function DeviceMonitor({ deviceData, disconnected, appIcon, conne
                             className="flex-1 hc-button rounded-xl font-primary text-[#8d3f34] px-4 py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:transform hover:-translate-y-1 transition-transform"
                         >
                             <Camera size={20} />
-                            {already ? "Requesting..." : "Spy Screenshot"}
+                            {already ? "Requesting..." : "Spy on screen"}
                         </button>
                         {spec > 0 && (
                             <div className="bg-hc-emerald/20 border-2 border-hc-emerald/30 px-4 py-3 rounded-xl flex items-center gap-2 text-hc-emerald">
