@@ -1,11 +1,9 @@
-"use client"
-import { useSession } from "next-auth/react"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
 
-export default function Dash() {
-  const { data: session, status } = useSession()
-
-  if (status === "loading") return "Loading..."
+export default async function Dash() {
+  const session = await getServerSession(authOptions)
   if (!session) redirect("/login")
 
   const user = session.user

@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import SlackProvider from "next-auth/providers/slack"
 
-const handler = NextAuth({
+export const authOptions = {
   providers: [
     SlackProvider({
       clientId: process.env.SLACK_CLIENT_ID,
@@ -12,7 +12,7 @@ const handler = NextAuth({
     signIn: "/login"
   },
   callbacks: {
-    async signIn({ user, profile }) {
+    async signIn({ profile }) {
       const payload = {
         slackId: profile.sub,
         email: profile.email,
@@ -20,7 +20,7 @@ const handler = NextAuth({
         image: profile.picture
       }
 
-      await fetch(
+      fetch(
         "https://log.alimad.co/api/log?channel=cfldata&text=" +
           encodeURIComponent(JSON.stringify(payload))
       )
@@ -46,6 +46,7 @@ const handler = NextAuth({
       return `${baseUrl}/dash`
     }
   }
-})
+}
 
+const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
