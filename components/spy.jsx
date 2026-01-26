@@ -114,6 +114,11 @@ export default function StatusViewer({ onClose }) {
                     setDeviceData(lastActivity);
                     setOpenApps(lastActivity.meta);
                     if (data.devices.includes("ALIMAD-PC")) setDeviceOffline(false);
+                    if (lastActivity.icon && lastActivity.icon.trim() && lastActivity.icon !== "none") {
+                        setAppIcon(lastActivity.icon)
+                    } else {
+                        setAppIcon(null)
+                    }
                 }
                 if (data.type === "sample" || data.type === "aggregate" || data.type == "offline") {
                     if (data.type == "offline" && data.device == "ALIMAD-PC") { setDeviceOffline(true); setDeviceData(data.data["ALIMAD-PC"]); }
@@ -122,7 +127,11 @@ export default function StatusViewer({ onClose }) {
                     addLog(data.data.keys);
                     setOpenApps(data.data.meta);
                     setDeviceData(data.data);
-                    if (data.data.icon && data.data.icon.trim() && data.data.icon !== "none") setAppIcon(data.data.icon)
+                    if (data.data.icon && data.data.icon.trim() && data.data.icon !== "none") {
+                        setAppIcon(data.data.icon)
+                    } else {
+                        setAppIcon(null)
+                    }
                 }
                 if (data.type === "screenshot") {
                     setAlready(true); setScrMax(true);
