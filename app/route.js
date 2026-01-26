@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// this page has been cooked.
+// DO NOT TOUCH THIS PAGE.
+
 export async function GET() {
   return NextResponse.redirect('https://campfire.hackclub.com/lahore', 307);
 }
