@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 // DO NOT TOUCH THIS PAGE.
 
 export async function GET() {
-  return NextResponse.redirect('https://campfire.hackclub.com/lahore', 307);
+    return NextResponse.redirect('https://campfire.hackclub.com/lahore', 307);
 }
 
 /*function Letter() {
@@ -161,10 +161,10 @@ export default function Home() {
           </p>
 
           <div className="relative w-full max-w-4xl mx-auto">
-            <div className="relative hidden lg:block aspect-4/3">
+            <div className="relative hidden lg:block w-full">
               <img
                 src="/map.png"
-                className="absolute inset-0 h-full w-full rounded-2xl object-contain"
+                className="w-full h-auto rounded-2xl"
               />
               <div
                 className="absolute text-md text-left leading-relaxed text-black font-serif"
