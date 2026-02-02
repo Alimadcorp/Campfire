@@ -3,8 +3,24 @@ import { NextResponse } from 'next/server';
 // this page has been cooked.
 // DO NOT TOUCH THIS PAGE.
 
-export async function GET() {
-    return NextResponse.redirect('https://campfire.hackclub.com/lahore', 307);
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const r = searchParams.get('r') || 'direct';
+
+  const ua = req.headers.get('user-agent') || '';
+  const os =
+    ua.includes('Windows') ? 'Windows' :
+    ua.includes('Linux') ? 'Linux' :
+    ua.includes('Mac') ? 'Mac' :
+    ua.includes('Android') ? 'Android' :
+    ua.includes('iPhone') || ua.includes('iPad') ? 'iOS' :
+    'Other';
+
+  fetch(
+    `https://log.alimad.co/api/log?channel=campfire-refer&text=${encodeURIComponent(r)}&status=${encodeURIComponent(os)}`
+  ).catch(() => {});
+
+  return NextResponse.redirect('https://campfire.hackclub.com/lahore', 307);
 }
 
 /*function Letter() {
