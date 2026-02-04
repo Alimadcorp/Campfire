@@ -531,13 +531,13 @@ export default function DashboardClient({ user, data }) {
                                     href={eventData?.formLink || ("https://forms.hackclub.com/campfire-signup?event=" + process.env.NEXT_PUBLIC_EVENT_ID)}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-2 border-white/20"
+                                    className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5
                                 >
                                     {eventData?.signups > 0 ? `Join ${eventData.signups} others!` : "Did u signup?"}
                                 </a>
                                 <a
                                     href="/dash/timetable"
-                                    className="bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-2 border-white/20"
+                                    className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5
                                 >
                                     Run-of-show?
                                 </a>
@@ -545,7 +545,7 @@ export default function DashboardClient({ user, data }) {
                                     href="https://instagram.com/campfire.lahore"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-2 border-white/20"
+                                    className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5
                                 >
                                     Instagram
                                 </a>
@@ -553,7 +553,7 @@ export default function DashboardClient({ user, data }) {
                                     href="https://cockpit.hackclub.com/signups"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-2 border-white/20"
+                                    className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5
                                 >
                                     View THE MAP!
                                 </a>
@@ -561,7 +561,7 @@ export default function DashboardClient({ user, data }) {
                                     href="https://training.campfire.hackclub.com"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-2 border-white/20"
+                                    className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5
                                 >
                                     Take the TRAINING
                                 </a>
@@ -569,7 +569,7 @@ export default function DashboardClient({ user, data }) {
                                     href="https://docs.google.com/document/d/1o0q0kp_mEZaAyuyjri4ch_tk83BQNBboIAO9Ntuto54/edit"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-2 border-white/20"
+                                    className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5
                                 >
                                     The MEGA PLAN
                                 </a>
