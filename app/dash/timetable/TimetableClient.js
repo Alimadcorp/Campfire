@@ -6,6 +6,7 @@ import Link from "next/link"
 export default function TimetableClient({ user, availableUsers }) {
     const [activeDate, setActiveDate] = useState(new Date().toISOString().split('T')[0])
     const [tasks, setTasks] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [newTask, setNewTask] = useState({
         title: "",
@@ -16,24 +17,36 @@ export default function TimetableClient({ user, availableUsers }) {
         date: new Date().toISOString().split('T')[0]
     })
 
-    const STORAGE_KEY = "campfire_timetable_tasks"
-
+    // Fetch tasks from API on mount
     useEffect(() => {
-        const savedTasks = localStorage.getItem(STORAGE_KEY)
-        if (savedTasks) {
+        const fetchTasks = async () => {
             try {
-                setTasks(JSON.parse(savedTasks))
-            } catch (e) {
-                console.error("Failed to parse tasks", e)
+                const response = await fetch('/api/timetable')
+                const data = await response.json()
+                setTasks(data.tasks || [])
+            } catch (error) {
+                console.error('Failed to fetch tasks:', error)
+            } finally {
+                setIsLoading(false)
             }
         }
+        fetchTasks()
     }, [])
 
-    useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
-    }, [tasks])
+    // Save tasks to API whenever they change
+    const saveTasks = async (updatedTasks) => {
+        try {
+            await fetch('/api/timetable', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tasks: updatedTasks })
+            })
+        } catch (error) {
+            console.error('Failed to save tasks:', error)
+        }
+    }
 
-    const handleAddTask = (e) => {
+    const handleAddTask = async (e) => {
         e.preventDefault()
         if (!newTask.title || !newTask.startTime || !newTask.endTime) return
 
@@ -42,7 +55,10 @@ export default function TimetableClient({ user, availableUsers }) {
             id: Date.now().toString(),
         }
 
-        setTasks([...tasks, taskToAdd].sort((a, b) => a.startTime.localeCompare(b.startTime)))
+        const updatedTasks = [...tasks, taskToAdd].sort((a, b) => a.startTime.localeCompare(b.startTime))
+        setTasks(updatedTasks)
+        await saveTasks(updatedTasks)
+
         setNewTask({
             title: "",
             startTime: "09:00",
@@ -54,8 +70,10 @@ export default function TimetableClient({ user, availableUsers }) {
         setIsAddModalOpen(false)
     }
 
-    const deleteTask = (id) => {
-        setTasks(tasks.filter(task => task.id !== id))
+    const deleteTask = async (id) => {
+        const updatedTasks = tasks.filter(task => task.id !== id)
+        setTasks(updatedTasks)
+        await saveTasks(updatedTasks)
     }
 
     const colors = [
@@ -106,7 +124,13 @@ export default function TimetableClient({ user, availableUsers }) {
                     ))}
                 </div>
 
-                {tasks.filter(t => (t.date || (t.day === "2" ? "2026-02-02" : "2026-02-01")) === activeDate).length === 0 ? (
+                {isLoading ? (
+                    <div className="bg-white/5 backdrop-blur-md rounded-3xl p-20 text-center">
+                        <div className="animate-spin inline-block w-12 h-12 border-4 border-current border-t-transparent text-secondary rounded-full mb-4" role="status" aria-label="loading">
+                        </div>
+                        <p className="text-xl text-white/50">Fetching your jam mission...</p>
+                    </div>
+                ) : tasks.filter(t => (t.date || (t.day === "2" ? "2026-02-02" : "2026-02-01")) === activeDate).length === 0 ? (
                     <div className="bg-white/5 backdrop-blur-md rounded-3xl border-4 border-dashed border-white/20 p-20 text-center">
                         <Clock size={64} className="mx-auto mb-6 opacity-30" />
                         <h3 className="text-3xl font-primary mb-2">No tasks for {new Date(activeDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</h3>
