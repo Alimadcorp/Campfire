@@ -40,21 +40,21 @@ export async function GET() {
     let gals = 0, boys = 0, other = 0, volunteer = 0, ages = {}, agesAll = {};
     let mostRecent;
     signupsData.forEach(signup => {
-        if (signup.pronouns === "she/her") {
-            gals++;
-        } else if (signup.pronouns === "he/him") {
-            boys++;
-        } else {
-            other++;
-        }
-        if (signup.isVolunteer) {
-            volunteer++;
-        }
         if (!signup.disabled) {
             if (ages[signup.age]) {
                 ages[signup.age]++;
             } else {
                 ages[signup.age] = 1;
+            }
+            if (signup.pronouns === "she/her") {
+                gals++;
+            } else if (signup.pronouns === "he/him") {
+                boys++;
+            } else {
+                other++;
+            }
+            if (signup.isVolunteer) {
+                volunteer++;
             }
         }
         if (agesAll[signup.age]) {
