@@ -80,7 +80,8 @@ export async function GET() {
         ages,
         mostRecent,
         agesAll,
-        signupTimes: signupsData.map(s => s.createdTime)
+        signupTimes: signupsData.map(s => s.createdTime),
+        referrals: signupsData.map(s => s.referralContext)
     };
     filtered.participants = participants;
     return Response.json(filtered);
