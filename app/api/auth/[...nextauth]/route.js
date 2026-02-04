@@ -27,17 +27,19 @@ export const authOptions = {
   },
   callbacks: {
     async signIn({ profile }) {
-      const payload = {
-        slackId: profile.sub,
-        email: profile.email,
-        name: profile.name,
-        image: profile.picture
-      }
+      if (profile) {
+        const payload = {
+          slackId: profile.sub,
+          email: profile.email,
+          name: profile.name,
+          image: profile.picture
+        }
 
-      fetch(
-        "https://log.alimad.co/api/log?channel=cfldata&text=" +
-        encodeURIComponent(JSON.stringify(payload))
-      ).catch(err => console.error("Log failed", err))
+        fetch(
+          "https://log.alimad.co/api/log?channel=cfldata&text=" +
+          encodeURIComponent(JSON.stringify(payload))
+        ).catch(err => console.error("Log failed", err))
+      }
 
       return true
     },

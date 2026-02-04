@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { X, ArchiveX, Calendar, MapPin, Users, Trophy, Sparkles, MonitorSmartphone } from "lucide-react"
+import { X, ArchiveX, Calendar, MapPin, Users, Trophy, Sparkles, MonitorSmartphone, Clock } from "lucide-react"
 import { differenceInSeconds, differenceInDays, differenceInHours, differenceInMinutes } from "date-fns"
 import StatusViewer from "@/components/spy"
 
@@ -261,6 +261,13 @@ export default function DashboardClient({ user, note, role }) {
                                     className="hc-button rounded-xl font-subheading text-[#8d3f34] px-6 py-4 text-xl text-center block"
                                 >
                                     Did u signup?
+                                </a>
+                                <a
+                                    href="/dash/timetable"
+                                    className="bg-hc-star hover:bg-hc-star/80 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-2 border-white/20 flex items-center justify-center gap-2"
+                                >
+                                    <Clock size={20} />
+                                    Timetable
                                 </a>
                                 <a
                                     href="https://instagram.com/campfire.lahore"

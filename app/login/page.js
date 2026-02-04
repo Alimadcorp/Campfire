@@ -64,13 +64,15 @@ export default function Login() {
           Login with Slack
         </button>
 
+
+
         <p className="text-lg font-subheading text-white/70 mt-4">
           Sign in to access your dashboard
         </p>
       </div>
 
       <img
-        src="/sky-shine.png"
+        src="/sky-shine.webp"
         className="sm:block absolute hidden bottom-0 left-0"
         alt=""
       />

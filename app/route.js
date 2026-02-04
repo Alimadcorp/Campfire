@@ -3,7 +3,23 @@ import { NextResponse } from 'next/server';
 // this page has been cooked.
 // DO NOT TOUCH THIS PAGE.
 
-export async function GET() {
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const r = searchParams.get('r') || 'direct';
+
+  const ua = req.headers.get('user-agent') || '';
+  const os =
+    ua.includes('Windows') ? 'Windows' :
+    ua.includes('Linux') ? 'Linux' :
+    ua.includes('Mac') ? 'Mac' :
+    ua.includes('Android') ? 'Android' :
+    ua.includes('iPhone') || ua.includes('iPad') ? 'iOS' :
+    'Other';
+
+  fetch(
+    `https://log.alimad.co/api/log?channel=campfire-refer&text=${encodeURIComponent(r)}&status=${encodeURIComponent(os)}`
+  ).catch(() => {});
+
   return NextResponse.redirect('https://campfire.hackclub.com/lahore', 307);
 }
 
@@ -161,10 +177,10 @@ export default function Home() {
           </p>
 
           <div className="relative w-full max-w-4xl mx-auto">
-            <div className="relative hidden lg:block aspect-4/3">
+            <div className="relative hidden lg:block w-full">
               <img
                 src="/map.png"
-                className="absolute inset-0 h-full w-full rounded-2xl object-contain"
+                className="w-full h-auto rounded-2xl"
               />
               <div
                 className="absolute text-md text-left leading-relaxed text-black font-serif"
