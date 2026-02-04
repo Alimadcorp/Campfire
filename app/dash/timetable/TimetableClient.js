@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Plus, Trash2, Clock, User, X, LayoutGrid, List } from "lucide-react"
+import { Plus, Trash2, Clock, User, X, LayoutGrid } from "lucide-react"
 import Link from "next/link"
 
 export default function TimetableClient({ user, availableUsers }) {
@@ -97,8 +97,8 @@ export default function TimetableClient({ user, availableUsers }) {
                             key={date}
                             onClick={() => setActiveDate(date)}
                             className={`px-6 py-3 rounded-xl text-lg font-primary transition-all whitespace-nowrap ${activeDate === date
-                                    ? "bg-secondary text-white shadow-[4px_4px_0px_rgba(0,0,0,0.3)] scale-105"
-                                    : "bg-white/10 text-white/60 hover:bg-white/20"
+                                ? "bg-secondary text-white shadow-[4px_4px_0px_rgba(0,0,0,0.3)] scale-105"
+                                : "bg-white/10 text-white/60 hover:bg-white/20"
                                 }`}
                         >
                             {new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}

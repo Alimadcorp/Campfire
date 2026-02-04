@@ -1,0 +1,72 @@
+{
+    "id": "rec5bXfCOC93cGPBe",
+    "name": "Campfire Lahore",
+    "city": "Lahore",
+    "slug": "lahore",
+    "country": "Pakistan",
+    "location": {
+        "lat": 31.52037,
+        "long": 74.35875
+    },
+    "format": "24-hour",
+    "poc": {
+        "name": [
+            "Ali"
+        ],
+        "email": [
+            "alimad.co.ltd@gmail.com"
+        ]
+    },
+    "rm": {
+        "name": [
+            "Daamin"
+        ],
+        "email": [
+            "daamin@events.hackclub.com"
+        ]
+    },
+    "signups": 124,
+    "goal": 100,
+    "progress": 0.365,
+    "formLink": "https://forms.hackclub.com/campfire-signup?event=rec5bXfCOC93cGPBe",
+    "created": "2025-12-04T12:22:49.000Z",
+    "venue": {
+        "id": "recCEVM2SGIeJpVmi",
+        "venueName": "Takhleeq Business Incubator",
+        "addressLine1": "University of Central Punjab, Pir Mansur Pir Mansoor Colony",
+        "addressLine2": "",
+        "addressCity": "Lahore",
+        "addressState": "Punjab",
+        "addressCountry": "Pakistan",
+        "addressZip": "54000"
+    },
+    "participants": {
+        "total": 73,
+        "deleted": 11,
+        "gals": 6,
+        "boys": 67,
+        "other": 0,
+        "volunteer": 2,
+        "ages": {
+            "12": 1,
+            "13": 1,
+            "15": 3,
+            "16": 7,
+            "17": 18,
+            "18": 25,
+            "19": 7
+        },
+        "mostRecent": "2026-02-03T18:53:05.000Z",
+        "agesAll": {
+            "12": 1,
+            "13": 1,
+            "15": 3,
+            "16": 7,
+            "17": 20,
+            "18": 30,
+            "19": 8,
+            "21": 2,
+            "24": 1
+        }
+    }
+}

@@ -70,12 +70,6 @@ export default function Login() {
           Sign in to access your dashboard
         </p>
       </div>
-
-      <img
-        src="/sky-shine.webp"
-        className="sm:block absolute hidden bottom-0 left-0"
-        alt=""
-      />
     </div>
   )
 }
