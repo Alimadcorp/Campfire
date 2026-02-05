@@ -9,6 +9,8 @@ import {
   Sparkles,
   MonitorSmartphone,
   TrendingUp,
+  RefreshCw,
+  LucideLoader2,
 } from "lucide-react";
 import { format } from "date-fns";
 import StatusViewer from "@/components/spy";
@@ -20,6 +22,7 @@ import SignupGraph from "@/components/graph";
 import CountdownTimer from "@/components/countdown";
 import Lookup from "@/components/lookup";
 import Chat from "@/components/chat";
+import Referrals from "@/components/referrals";
 
 export default function DashboardClient({ user, data }) {
   const [isDismissed, setIsDismissed] = useState(false);
@@ -27,21 +30,32 @@ export default function DashboardClient({ user, data }) {
   const [spyMode, setSpyMode] = useState(false);
   const [eventData, setEventData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [ml, setMl] = useState(true);
   const [status, setStatus] = useState({ signedUp: false, loading: true });
 
+  async function fetchEventData() {
+    try {
+      setMl(true);
+      const res = await fetch("/api/event/info");
+      const edata = await res.json();
+      setEventData(edata);
+    } catch (err) {
+      console.error("Failed to fetch event data:", err);
+    } finally {
+      setLoading(false);
+      setMl(false);
+    }
+  }
+
   useEffect(() => {
-    const fetchEventData = async () => {
-      try {
-        const res = await fetch("/api/event/info");
-        const edata = await res.json();
-        setEventData(edata);
-      } catch (err) {
-        console.error("Failed to fetch event data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchEventData();
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      fetchEventData();
+    }, 60_000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -99,8 +113,8 @@ export default function DashboardClient({ user, data }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#001122] flex items-center justify-center">
-        <div className="animate-bounce">
-          <Sparkles className="text-hc-star w-12 h-12" />
+        <div className="animate-spin">
+          <LucideLoader2 className="text-hc-star w-12 h-12" />
         </div>
       </div>
     );
@@ -120,7 +134,21 @@ export default function DashboardClient({ user, data }) {
         className="absolute w-full bottom-0 left-0 opacity-30 pointer-events-none mask:linear-gradient(to_top,black_60%,transparent) -scale-y-100 -scale-x-100"
         alt=""
       />
-
+      <div className="sticky top-0 z-30 w-full flex justify-end pointer-events-none">
+        <button
+          onClick={fetchEventData}
+          disabled={ml}
+          aria-label="Refresh event data"
+          title="Refresh event data"
+          className="m-2 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center pointer-events-auto"
+          style={{ position: "sticky", top: 0, right: 0 }}
+        >
+          <RefreshCw
+            size={18}
+            className={"text-white/90 " + (ml ? "animate-spin" : "")}
+          />
+        </button>
+      </div>
       <div className="relative z-10 w-full flex flex-col items-center">
         <h1 className="text-5xl sm:text-7xl solid-shadow mb-2 text-center uppercase">
           {eventData?.name || "CAMPFIRE LAHORE"}
@@ -158,7 +186,7 @@ export default function DashboardClient({ user, data }) {
                   <div className="flex flex-col gap-4">
                     <h2 className="text-3xl font-subheading flex items-center gap-2">
                       <Sparkles size={28} className="text-hc-star" />
-                      From the Organizers
+                      From the PoC
                     </h2>
                     <div className="text-xl font-serif leading-relaxed opacity-90">
                       {data.note}
@@ -292,9 +320,7 @@ export default function DashboardClient({ user, data }) {
                 icon={Users}
                 title="Signups"
                 value={
-                  eventData?.signups
-                    ? `${eventData.signups}`
-                    : "500+ Hackers"
+                  eventData?.signups ? `${eventData.signups}` : "500+ Hackers"
                 }
                 color="bg-hc-tortoise"
                 subtitle={
@@ -316,9 +342,7 @@ export default function DashboardClient({ user, data }) {
               />
             </div>
             <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              <Chat
-                user={data}
-              />
+              <Chat user={data} />
               <Lookup
                 ages={eventData?.participants?.ages}
                 eventData={eventData}
@@ -331,6 +355,7 @@ export default function DashboardClient({ user, data }) {
                 ages={eventData?.participants?.ages}
                 eventData={eventData}
               />
+              <Referrals data={eventData?.participants?.referrals} />
             </div>
 
             <div className="w-full max-w-6xl bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 hover:backdrop-blur-none backdrop-blur-sm transition-all duration-300 cursor-default group">
@@ -397,7 +422,7 @@ export default function DashboardClient({ user, data }) {
 
         <div className="mt-12 text-center opacity-60">
           <p className="font-subheading text-md">
-            Made by Mister Ali :P Also Ammar P:
+            Made by Mister Ali :P Also Ammar P: | Data updated {timeago(new Date(eventData?.lastUpdated))}
           </p>
         </div>
       </div>

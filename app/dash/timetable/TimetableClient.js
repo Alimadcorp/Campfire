@@ -16,8 +16,6 @@ export default function TimetableClient({ user, availableUsers }) {
         color: "bg-hc-star",
         date: new Date().toISOString().split('T')[0]
     })
-
-    // Fetch tasks from API on mount
     useEffect(() => {
         const fetchTasks = async () => {
             try {
@@ -32,8 +30,6 @@ export default function TimetableClient({ user, availableUsers }) {
         }
         fetchTasks()
     }, [])
-
-    // Save tasks to API whenever they change
     const saveTasks = async (updatedTasks) => {
         try {
             await fetch('/api/timetable', {
@@ -244,8 +240,7 @@ export default function TimetableClient({ user, availableUsers }) {
                                         value={newTask.assignedTo}
                                         onChange={e => setNewTask({ ...newTask, assignedTo: e.target.value })}
                                     >
-                                        <option value="">Unassigned</option>
-                                        {availableUsers.map(u => (
+                                        {(Array.isArray(availableUsers) ? availableUsers : Object.values(availableUsers)).map(u => (
                                             <option key={u.name} value={u.name}>{u.name}</option>
                                         ))}
                                     </select>

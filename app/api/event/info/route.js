@@ -1,17 +1,12 @@
-
-const id = process.env.NEXT_PUBLIC_EVENT_ID;
-const cockpit = process.env.COCKPIT_URL;
-const token = process.env.COCKPIT_TOKEN;
+import { Redis } from "@upstash/redis";
+const redis = new Redis({
+  url: process.env.ADMIN_REDIS,
+  token: process.env.ADMIN_REDIS_TOKEN,
+});
 
 export async function GET() {
-
-    const res = await fetch(`${cockpit}/api/events/${id}`, {
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    })
-    const data = await res.json();
+    const allData = await redis.get("event");
+    const data = allData.event;
     let filtered = {
         id: data.id,
         name: data.displayName,
@@ -29,13 +24,7 @@ export async function GET() {
         created: data.createdTime,
         venue: data.venue
     }
-    const signups = await fetch(`${cockpit}/api/events/${id}/participants`, {
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    })
-    const signupsData = await signups.json();
+    const signupsData = allData.participants;
     let deleted = signupsData.length - data.numParticipants;
     let gals = 0, boys = 0, other = 0, volunteer = 0, ages = {}, agesAll = {};
     let mostRecent, mostRecentName;
@@ -87,5 +76,6 @@ export async function GET() {
         referrals: signupsData.map(s => s.referralContext)
     };
     filtered.participants = participants;
+    filtered.lastUpdated = allData.lastUpdated;
     return Response.json(filtered);
 }

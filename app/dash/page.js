@@ -24,6 +24,7 @@ export default async function Dash() {
   if (!session) redirect("/login");
 
   const user = session.user;
+  console.log(user);
 
   const userData = orgs[user.slackId] || orgs["default"];
 

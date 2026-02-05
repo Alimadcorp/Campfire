@@ -1,5 +1,6 @@
 "use client"
 import { signIn } from "next-auth/react"
+import LoginForm from "./LoginForm"
 
 export default function Login() {
   return (
@@ -64,7 +65,12 @@ export default function Login() {
           Login with Slack
         </button>
 
-
+        <div className="w-full max-w-md mt-6 bg-white/10 rounded-2xl p-6 flex flex-col items-center gap-4">
+          <h2 className="text-2xl font-primary text-white mb-2">
+            Or login with username & password
+          </h2>
+          <LoginForm />
+        </div>
 
         <p className="text-lg font-subheading text-white/70 mt-4">
           Sign in to access your dashboard

@@ -1,6 +1,8 @@
-const id = process.env.NEXT_PUBLIC_EVENT_ID;
-const cockpit = process.env.COCKPIT_URL;
-const token = process.env.COCKPIT_TOKEN;
+import { Redis } from "@upstash/redis";
+const redis = new Redis({
+  url: process.env.ADMIN_REDIS,
+  token: process.env.ADMIN_REDIS_TOKEN,
+});
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -11,13 +13,8 @@ export async function GET(request) {
       { status: 400 },
     );
   }
-  const signups = await fetch(`${cockpit}/api/events/${id}/participants`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const signupsData = await signups.json();
+  const signupsData = (await redis.get("event")).participants;
+
   let output = {
     hits: 0,
     result: { signedUp: false, disabled: false },

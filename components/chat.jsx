@@ -20,10 +20,10 @@ export default function Chat({ user }) {
         </p>
       </div>
       <div className="flex-1 flex flex-col w-full">
-        <div className="flex-1 w-full overflow-y-auto mb-4 font-subheading p-1 space-y-2">
-          <div className="whitespace-pre-wrap">{"Ali: hi sorry chats arent ready yet"}</div>
+        <div className="flex-1 w-full overflow-y-auto mb-4 font-subheading p-1 space-y-2 max-h-70">
+          <div className="whitespace-pre-wrap">{"Ali: hi sorry chats arent ready yet\n".repeat(100)}</div>
         </div>
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 mt-0">
           <input
             type="text"
             value={msg}
