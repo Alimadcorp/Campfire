@@ -62,7 +62,6 @@
   }
 
   a {
-    font-weight: bold;
     opacity: 100%;
   }
 
@@ -100,5 +99,7 @@
 
   --font-primary: var(--font-primary);
   --font-subheading: var(--font-subheading);
+  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans);
   --font-serif: var(--font-source-serif);
 }

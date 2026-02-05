@@ -220,6 +220,24 @@ export default function DashboardClient({ user, data }) {
                         {data.role || "Hacker"}
                       </p>
                     </div>
+                    <div className="mt-3 inline-block bg-white/30 px-4 py-2 ml-2 rounded-full">
+                      <a
+                        className="font-primary text-xl text-hc-brown hover:underline"
+                        href="/dash/timetable"
+                      >
+                        Timetable
+                      </a>
+                    </div>
+                    {data.role == "PoC" && (
+                      <div className="mt-3 inline-block bg-white/30 px-4 py-2 rounded-full ml-2">
+                        <a
+                          className="font-primary text-xl text-hc-brown hover:underline"
+                          href="/dash/table"
+                        >
+                          Signups
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -240,13 +258,23 @@ export default function DashboardClient({ user, data }) {
                       <p className="font-primary text-lg text-hc-brown">
                         {status.loading
                           ? "Checking..."
-                          : (status.signedUp
-                              ? status.disabled
-                                ? "Rejected"
-                                : status.volunteer
-                                  ? "Signed Up as Organizer"
-                                  : "Signed Up"
-                              : "Not Signed Up") + ` ${timeago(status.time)}`}
+                          : status.signedUp
+                            ? status.disabled
+                              ? "Rejected" + ` ${timeago(status.time)}`
+                              : status.volunteer
+                                ? "Signed Up as Organizer" +
+                                  ` ${timeago(status.time)}`
+                                : "Signed Up" + ` ${timeago(status.time)}`
+                            : "Not Signed Up!"}
+
+                        {!status.signedUp || status.disabled && (
+                          <a
+                            href="https://forms.hackclub.com/campfire-signup?event=rec5bXfCOC93cGPBe?r=47"
+                            className="ml-2 text-2xl text-red hover:underline"
+                          >
+                            SIGNUP, NOWW!
+                          </a>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -422,7 +450,8 @@ export default function DashboardClient({ user, data }) {
 
         <div className="mt-12 text-center opacity-60">
           <p className="font-subheading text-md">
-            Made by Mister Ali :P Also Ammar P: | Data updated {timeago(new Date(eventData?.lastUpdated))}
+            Made by Mister Ali :P Also Ammar P: | Data updated{" "}
+            {timeago(new Date(eventData?.lastUpdated))}
           </p>
         </div>
       </div>

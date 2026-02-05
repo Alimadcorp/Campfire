@@ -1,5 +1,16 @@
 import "./globals.css";
 import localFont from "next/font/local";
+import { Geist, Geist_Mono } from "next/font/google";
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
 export const primaryFont = localFont({
   src: "../public/font.otf",
@@ -62,7 +73,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" crosspilot="" suppressHydrationWarning>
       <body
-        className={`${primaryFont.variable} ${secFont.variable} ${sourceSerif.variable} antialiased bg-primary`}
+        className={`${primaryFont.variable} ${secFont.variable} ${sourceSerif.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-black`}
         suppressHydrationWarning
       >
         {children}
