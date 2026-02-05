@@ -25,7 +25,8 @@ export async function GET() {
         venue: data.venue
     }
     const signupsData = allData.participants;
-    let deleted = signupsData.length - data.numParticipants;
+    let deleted = signupsData.filter(e => e.disabled).length;
+    filtered.signups = signupsData.filter(e => !e.disabled).length;
     let gals = 0, boys = 0, other = 0, volunteer = 0, ages = {}, agesAll = {};
     let mostRecent, mostRecentName;
     signupsData.forEach(signup => {

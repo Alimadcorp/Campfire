@@ -200,7 +200,7 @@ export default function StatusViewer({ onClose }) {
 
             <div className="w-full grid md:grid-cols-2 gap-6">
                 {screenshot && scrMax && (
-                    <div className="fixed inset-0 flex items-center justify-center z-[100] backdrop-blur-md bg-black/80 p-8">
+                    <div className="fixed inset-0 flex items-center justify-center z-100 backdrop-blur-md bg-black/80 p-8">
                         <div className="absolute inset-0" onClick={() => setScrMax(false)}></div>
                         <div className="relative pointer-events-auto max-w-[90vw] max-h-[90vh] rounded-2xl overflow-hidden border-4 border-hc-border shadow-2xl">
                             <img
