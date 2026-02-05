@@ -7,9 +7,11 @@ This is the organizers portal
 ---
 
 ## App Routes
+
 `/`
 
   - reditect to https://campfire.hackclub.com/lahore
+  - log reference query param `r`
 
 `/login`
 
@@ -20,7 +22,23 @@ This is the organizers portal
 
   - auth callbacks
 
+`/api/event/cron`
+
+  - perform a cronjob
+
+`/api/event/info`
+
+  - get event info
+
+`/api/event/lookup`
+
+  - look for a specific signup with search param `q`
+
 `/dash`
 
   - the dashboard :elmo-fire:
   - idk what to add here yet
+
+`/dash/timetable`
+
+  - hmmmmmmm

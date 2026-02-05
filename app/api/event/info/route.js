@@ -38,7 +38,7 @@ export async function GET() {
     const signupsData = await signups.json();
     let deleted = signupsData.length - data.numParticipants;
     let gals = 0, boys = 0, other = 0, volunteer = 0, ages = {}, agesAll = {};
-    let mostRecent;
+    let mostRecent, mostRecentName;
     signupsData.forEach(signup => {
         if (!signup.disabled) {
             if (ages[signup.age]) {
@@ -64,9 +64,11 @@ export async function GET() {
         }
         if (!mostRecent) {
             mostRecent = new Date(signup.createdTime);
+            mostRecentName = signup.displayName;
         } else {
             if (new Date(signup.createdTime) > mostRecent) {
                 mostRecent = new Date(signup.createdTime);
+                mostRecentName = signup.displayName;
             }
         }
     });
@@ -79,6 +81,7 @@ export async function GET() {
         volunteer,
         ages,
         mostRecent,
+        mostRecentName,
         agesAll,
         signupTimes: signupsData.map(s => s.createdTime),
         referrals: signupsData.map(s => s.referralContext)

@@ -30,7 +30,7 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--secondary) transparent;
+    scrollbar-color: #fff4 transparent;
   }
 
   .solid-shadow {
