@@ -13,7 +13,7 @@ export default function AgeDistribution({ ages, eventData }) {
 
   if (ageData.length === 0) {
     return (
-      <div className="w-full bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 hover:backdrop-blur-none backdrop-blur-sm transition-all duration-300 cursor-default group flex flex-col items-center justify-center min-h-[300px]">
+      <div className="w-full bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 hover:backdrop-blur-none backdrop-blur-sm transition-all duration-300 cursor-default group flex flex-col items-center justify-center min-h-75">
         <Users size={32} className="text-white/20 mb-4" />
         <h4 className="text-xl font-subheading uppercase tracking-wider text-white/40">
           Age Distribution

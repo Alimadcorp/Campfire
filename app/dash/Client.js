@@ -209,7 +209,7 @@ export default function DashboardClient({ user, data }) {
                     )}
                   </div>
                   <div className="overflow-hidden flex-1">
-                    <h2 className="text-4xl mb-1 text-hc-brown solid-shadow text-white truncate max-w-full">
+                    <h2 className="text-4xl mb-1 solid-shadow text-white truncate max-w-full">
                       {user.name}
                     </h2>
                     <p className="font-subheading text-xl text-hc-brown opacity-80 truncate">
@@ -371,7 +371,7 @@ export default function DashboardClient({ user, data }) {
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5"
+                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border border-white/5"
                 >
                   {eventData?.signups > 0
                     ? `Join ${eventData.signups} others!`
@@ -379,7 +379,7 @@ export default function DashboardClient({ user, data }) {
                 </a>
                 <a
                   href="/dash/timetable"
-                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5"
+                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border border-white/5"
                 >
                   Run-of-show?
                 </a>
@@ -387,7 +387,7 @@ export default function DashboardClient({ user, data }) {
                   href="https://instagram.com/campfire.lahore"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5"
+                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border border-white/5"
                 >
                   Instagram
                 </a>
@@ -395,7 +395,7 @@ export default function DashboardClient({ user, data }) {
                   href="https://cockpit.hackclub.com/signups"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5"
+                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border border-white/5"
                 >
                   View THE MAP!
                 </a>
@@ -403,7 +403,7 @@ export default function DashboardClient({ user, data }) {
                   href="https://training.campfire.hackclub.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5"
+                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border border-white/5"
                 >
                   Take the TRAINING
                 </a>
@@ -411,7 +411,7 @@ export default function DashboardClient({ user, data }) {
                   href="https://docs.google.com/document/d/1o0q0kp_mEZaAyuyjri4ch_tk83BQNBboIAO9Ntuto54/edit"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border-1 border-white/5"
+                  className="bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-subheading text-white px-6 py-4 text-xl text-center block border border-white/5"
                 >
                   The MEGA PLAN
                 </a>

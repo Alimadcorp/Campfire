@@ -81,7 +81,7 @@ export default function TimetableClient({ user, availableUsers }) {
     ]
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-[#001122] via-[#001a33] to-[#002244] p-4 sm:p-8 font-primary text-white flex flex-col items-center relative overflow-hidden">
+        <div className="min-h-screen bg-linear-to-b from-[#001122] via-[#001a33] to-[#002244] p-4 sm:p-8 font-primary text-white flex flex-col items-center relative overflow-hidden">
             <img
                 src="/sky-shine.webp"
                 className="absolute w-full top-0 left-0 opacity-30 pointer-events-none"
