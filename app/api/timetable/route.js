@@ -8,7 +8,6 @@ const redis = new Redis({
 
 const TIMETABLE_KEY = 'campfire:timetable:tasks'
 
-// GET - Fetch all tasks
 export async function GET() {
     try {
         const tasks = await redis.get(TIMETABLE_KEY)
@@ -19,7 +18,6 @@ export async function GET() {
     }
 }
 
-// POST - Save tasks
 export async function POST(request) {
     try {
         const { tasks } = await request.json()

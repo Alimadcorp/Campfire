@@ -14,7 +14,7 @@ export default function TimetableClient({ user, availableUsers }) {
         endTime: "10:00",
         assignedTo: "",
         color: "bg-hc-star",
-        date: new Date().toISOString().split('T')[0]
+        date: "2026-02-28"
     })
     useEffect(() => {
         const fetchTasks = async () => {
@@ -73,7 +73,6 @@ export default function TimetableClient({ user, availableUsers }) {
     }
 
     const colors = [
-        { name: "Star Blue", value: "bg-hc-star" },
         { name: "Emerald", value: "bg-hc-emerald" },
         { name: "Secondary", value: "bg-secondary" },
         { name: "Tortoise", value: "bg-hc-tortoise" },
@@ -135,7 +134,7 @@ export default function TimetableClient({ user, availableUsers }) {
                             onClick={() => setIsAddModalOpen(true)}
                             className="text-secondary hover:underline text-xl font-bold"
                         >
-                            Create a Task →
+                            Create a Task
                         </button>
                     </div>
                 ) : (
@@ -145,7 +144,7 @@ export default function TimetableClient({ user, availableUsers }) {
                             .map((task) => (
                                 <div
                                     key={task.id}
-                                    className={`${task.color} p-6 rounded-2xl border-4 border-black/10 shadow-[8px_8px_0px_rgba(0,0,0,0.2)] text-white relative overflow-hidden group hover:scale-[1.01] transition-all`}
+                                    className={`${task.color} p-6 rounded-2xl border-4 border-black/10 shadow-[8px_8px_0px_rgba(0,0,0,0.2)] text-black relative overflow-hidden group hover:scale-[1.01] transition-all`}
                                 >
                                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
@@ -181,11 +180,10 @@ export default function TimetableClient({ user, availableUsers }) {
                 )}
             </div>
 
-            {/* Modal */}
             {isAddModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)}></div>
-                    <div className="relative bg-hc-paper border-8 border-hc-border rounded-3xl p-8 w-full max-w-xl text-hc-brown shadow-[12px_12px_0px_rgba(0,0,0,0.3)] animate-in zoom-in-95 duration-200">
+                    <div className="relative scale-80 bg-hc-paper border-8 border-hc-border rounded-3xl p-8 w-full max-w-xl text-hc-brown shadow-[12px_12px_0px_rgba(0,0,0,0.3)] animate-in zoom-in-95 duration-200">
                         <button
                             onClick={() => setIsAddModalOpen(false)}
                             className="absolute top-4 right-4 p-2 hover:bg-black/10 rounded-full text-hc-brown/70 transition-colors"
@@ -193,7 +191,7 @@ export default function TimetableClient({ user, availableUsers }) {
                             <X size={32} />
                         </button>
 
-                        <h2 className="text-4xl font-primary mb-8 solid-shadow text-white">New Jam Task</h2>
+                        <h2 className="text-4xl font-primary mb-8 solid-shadow text-black">New Jam Task</h2>
 
                         <form onSubmit={handleAddTask} className="flex flex-col gap-6">
                             <div>
