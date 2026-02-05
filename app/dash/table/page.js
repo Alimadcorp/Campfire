@@ -81,6 +81,25 @@ export default function TablePage() {
     }
   }, [marks]);
 
+  useEffect(() => {
+    async function fetchMarksFromRedis() {
+      try {
+        const res = await fetch("/api/event/ids");
+        if (res.ok) {
+          const remoteMarks = await res.json();
+          if (remoteMarks && typeof remoteMarks === "object") {
+            setMarks(remoteMarks);
+            if (typeof window !== "undefined") {
+              localStorage.setItem("participantMarks", JSON.stringify(remoteMarks));
+            }
+          }
+        }
+      } catch (e) {
+      }
+    }
+    fetchMarksFromRedis();
+  }, []);
+
   const toggleMark = (id) => {
     setMarks((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -126,7 +145,10 @@ export default function TablePage() {
       p.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.legalFirstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.legalLastName.toLowerCase().includes(searchQuery.toLowerCase());
+      p.legalLastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.phone.toLowerCase().includes(searchQuery.toLowerCase().replaceAll(" ", "")) ||
+      p.pronouns.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.referralContext.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesFilters =
       (filters.volunteer === null || p.isVolunteer === filters.volunteer) &&
@@ -177,31 +199,38 @@ export default function TablePage() {
   );
 
   function exportCSV() {
-    const cols = Object.keys(visibleCols).filter((c) => visibleCols[c]);
-    const rows = filtered.map((p) =>
-      [
-        cols.includes("name") ? p.displayName : null,
-        cols.includes("email") ? p.email : null,
-        cols.includes("phone") ? p.phone : null,
-        cols.includes("pronouns") ? p.pronouns : null,
-        cols.includes("age") ? p.age : null,
-        cols.includes("joined")
-          ? new Date(p.createdTime).toLocaleString()
-          : null,
-        cols.includes("status")
-          ? [
-              p.isVolunteer ? "Volunteer" : "",
-              p.disabled ? "Disabled" : "",
-              p.pendingVolunteer ? "Pending Volunteer" : "",
-              p.pendingDisable ? "Pending Disable" : "",
-            ]
-              .filter(Boolean)
-              .join(", ") || "Hacker"
-          : null,
-        cols.includes("ref") ? p.referralContext : null,
-      ].filter(Boolean),
-    );
-    const csv = [cols.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    // Always include all columns, not just visible ones
+    const cols = [
+      "id",
+      "displayName",
+      "email",
+      "phone",
+      "pronouns",
+      "age",
+      "createdTime",
+      "isVolunteer",
+      "disabled",
+      "pendingVolunteer",
+      "pendingDisable",
+      "referralContext",
+      "mark"
+    ];
+    const rows = data.participants.map((p) => [
+      p.id,
+      p.displayName,
+      p.email,
+      p.phone,
+      p.pronouns,
+      p.age,
+      new Date(p.createdTime).toLocaleString(),
+      p.isVolunteer ? "1" : "0",
+      p.disabled ? "1" : "0",
+      p.pendingVolunteer ? "1" : "0",
+      p.pendingDisable ? "1" : "0",
+      p.referralContext,
+      marks[p.id] ? "1" : "0"
+    ]);
+    const csv = [cols.join(","), ...rows.map((r) => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -209,6 +238,14 @@ export default function TablePage() {
     a.download = "participants.csv";
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function syncMarksToRedis() {
+    await fetch("/api/event/ids", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(marks),
+    });
   }
 
   function CopyCell({ value, children, strip }) {
@@ -236,7 +273,7 @@ export default function TablePage() {
   return (
     <div className="w-screen h-screen overflow-x-hidden bg-black flex flex-col items-center justify-start p-2 sm:p-4 font-mono text-white">
       <div className="w-full h-full">
-        <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div className="mb-2 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
           <div>
             <h1 className="text-3xl font-bold text-white mb-1 tracking-tight">
               SIGNUPS
@@ -258,7 +295,7 @@ export default function TablePage() {
             </p>
             <input
               type="text"
-              placeholder=">>> search by name or email..."
+              placeholder=">>> search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full mb-2 px-3 py-2 bg-black border border-cyan-700/40 rounded text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-cyan-600 text-sm font-mono"
@@ -340,6 +377,12 @@ export default function TablePage() {
               onClick={exportCSV}
             >
               Export CSV
+            </button>
+            <button
+              className="px-2 py-1 rounded bg-blue-700 text-white text-xs font-bold hover:bg-blue-800"
+              onClick={syncMarksToRedis}
+            >
+              Sync Marks
             </button>
             <div className="flex gap-1">
               {Object.keys(visibleCols).map((col) => (
