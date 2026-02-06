@@ -59,7 +59,7 @@ export default function TablePage() {
 
   async function refreshh() {
     setCron(true);
-    await fetch("/cron?pwd=qwertyuioplkjhgfdsazxcvbnm");
+    await fetch("/cron?pwd="+process.env.NEXT_PUBLIC_CRON_SECRET);
     fetch("/api/event/table")
       .then((r) => (r.ok ? r.json() : Promise.reject(r)))
       .then(setData)

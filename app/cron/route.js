@@ -12,7 +12,7 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const bkp = searchParams.get("bkp");
   const pwd = searchParams.get("pwd");
-  if (pwd !== process.env.NEXTAUTH_SECRET) return new Response("Unauthorized");
+  if (pwd !== process.env.NEXT_PUBLIC_CRON_SECRET) return new Response("Unauthorized");
   const event = await fetch(`${cockpit}/api/events/${id}`, {
     headers: {
       "Content-Type": "application/json",
