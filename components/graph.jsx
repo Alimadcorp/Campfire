@@ -60,7 +60,7 @@ export default function SignupGraph({ signupTimes = [] }) {
             {data[0]?.label} — {data[data.length - 1]?.label}
           </p>
           <p className="text-xs sm:text-sm opacity-50 mt-0">
-            {data[0]?.count} in the last 3 days
+            {data[0]?.count} in the last 2 days
           </p>
         </div>
       </div>
@@ -106,7 +106,6 @@ export default function SignupGraph({ signupTimes = [] }) {
                 height={H}
                 fill="transparent"
                 onMouseEnter={() => setHover(i)}
-                onMouseLeave={() => setHover(null)}
               />
               {hover === i && (
                 <>

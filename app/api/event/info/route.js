@@ -27,15 +27,10 @@ export async function GET() {
     const signupsData = allData.participants;
     let deleted = signupsData.filter(e => e.disabled).length;
     filtered.signups = signupsData.filter(e => !e.disabled).length;
-    let gals = 0, boys = 0, other = 0, volunteer = 0, ages = {}, agesAll = {};
+    let gals = 0, boys = 0, other = 0, volunteer = 0, ages = {};
     let mostRecent, mostRecentName;
     signupsData.forEach(signup => {
         if (!signup.disabled) {
-            if (ages[signup.age]) {
-                ages[signup.age]++;
-            } else {
-                ages[signup.age] = 1;
-            }
             if (signup.pronouns === "she/her") {
                 gals++;
             } else if (signup.pronouns === "he/him") {
@@ -47,10 +42,21 @@ export async function GET() {
                 volunteer++;
             }
         }
-        if (agesAll[signup.age]) {
-            agesAll[signup.age]++;
+        if (ages[signup.age]) {
+            ages[signup.age].base++;
+            if (signup.disabled) {
+                ages[signup.age].deleted++;
+            }
+            if (signup.pronouns === "he/him") {
+                ages[signup.age].he++;
+            } else if (signup.pronouns === "she/her") {
+                ages[signup.age].she++;
+            }
+            if (signup.isVolunteer) {
+                ages[signup.age].volunteer++;
+            }
         } else {
-            agesAll[signup.age] = 1;
+            ages[signup.age] = { base: 1, deleted: signup.disabled ? 1 : 0, he: signup.pronouns === "he/him" ? 1 : 0, she: signup.pronouns === "she/her" ? 1 : 0, volunteer: signup.isVolunteer ? 1 : 0 };
         }
         if (!mostRecent) {
             mostRecent = new Date(signup.createdTime);
@@ -71,8 +77,7 @@ export async function GET() {
         volunteer,
         ages,
         mostRecent,
-        mostRecentName,
-        agesAll,
+        mostRecentName: mostRecentName.trim(),
         signupTimes: signupsData.map(s => s.createdTime),
         referrals: signupsData.map(s => s.referralContext)
     };
