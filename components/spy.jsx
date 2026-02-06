@@ -55,7 +55,7 @@ export default function StatusViewer({ onClose }) {
         "chrome": false,
         "windowsterminal": false
     })
-    const [appIcon, setAppIcon] = useState("");
+    const [appIcon, setAppIcon] = useState(null);
     const wsRef = useRef(null)
     const timeoutRef = useRef(null)
     const [log, setLog] = useState("");
@@ -116,8 +116,6 @@ export default function StatusViewer({ onClose }) {
                     if (data.devices.includes("ALIMAD-PC")) setDeviceOffline(false);
                     if (lastActivity.icon && lastActivity.icon.trim() && lastActivity.icon !== "none") {
                         setAppIcon(lastActivity.icon)
-                    } else {
-                        setAppIcon(null)
                     }
                 }
                 if (data.type === "sample" || data.type === "aggregate" || data.type == "offline") {
@@ -129,8 +127,6 @@ export default function StatusViewer({ onClose }) {
                     setDeviceData(data.data);
                     if (data.data.icon && data.data.icon.trim() && data.data.icon !== "none") {
                         setAppIcon(data.data.icon)
-                    } else {
-                        setAppIcon(null)
                     }
                 }
                 if (data.type === "screenshot") {
