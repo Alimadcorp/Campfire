@@ -1,8 +1,6 @@
 Deployed by Vercel to https://campfire.alimad.co
 
-Project is connected, push will lead to instant deployment
-
-This is the organizers portal
+This is an organizers portal
 
 ---
 
@@ -10,17 +8,21 @@ This is the organizers portal
 
 1. Fork/Clone this repo
 
-2. Edit .env.example and rename to .env.local
+2. Edit `.env.example` and rename to `.env.local`
 
-3. npm run dev
+3. Edit `/lib/orgs.js`
+
+4. next dev
 
 # How to Deploy
 
 1. Fork/Clone this repo
 
-2. Edit .env.example
+2. Edit `.env.example`
 
-3. npm run build
+3. Edit `/lib/orgs.js`
+
+4. next build
 
 ---
 
