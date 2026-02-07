@@ -290,7 +290,7 @@ export default function DashboardClient({ user, data }) {
                         NEW
                       </span>
                       <p className="font-primary text-red-900 text-xl font-black italic tracking-wide group-hover:underline decoration-wavy decoration-red-600">
-                        SPY ON THE PoC, NOW!
+                        SPY ON YOUR PoC, {eventData.poc.name} NOW!
                       </p>
                       <span className="bg-red-600 text-white text-sm font-black px-2 py-1 rounded -rotate-3 animate-pulse">
                         HOT!

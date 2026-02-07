@@ -6,24 +6,6 @@ This is the organizers portal
 
 ---
 
-# How to Test
-
-1. Fork/Clone this repo
-
-2. Edit .env.example and rename to .env.local
-
-3. npm run dev
-
-# How to Deploy
-
-1. Fork/Clone this repo
-
-2. Edit .env.example
-
-3. npm run build
-
----
-
 ## App Routes
 
 `/`
@@ -36,18 +18,13 @@ This is the organizers portal
   - login with Slack auth (for organizers), slack app token is already saved as SLACK_CLIENT_ID, SLACK_CLIENT_SECRET
   - required scopes: all profile scopes
 
-`/api/auth/callback/:nextauth`
+`/api/auth/callback/slack`
 
   - auth callbacks
 
-`/api/event/ids`
-  
-  - GET/POST the participant mark state (you can mark participants in the PoC dashboard in order to keep track and stuff :3c)
-
 `/api/event/cron`
-  
-  - accepts 
-  - cache the cockpit signups so that we dont overload stuff
+
+  - perform a cronjob
 
 `/api/event/info`
 
@@ -57,26 +34,10 @@ This is the organizers portal
 
   - look for a specific signup with search param `q`
 
-`/api/event/table`
-
-  - the participants list. only visible to PoC
-
-`/api/redis/latency`
-
-  - for absolutely no reason, check redis get/set latency
-
-`/api/timetable`
-
-  - GET/POST the timetable. its kind of the run-of-show thingy
-
 `/dash`
 
   - the dashboard :elmo-fire:
-  - a lot of stats live here
-
-`/dash/table`
-
-  - the participants table. only visible to PoC
+  - idk what to add here yet
 
 `/dash/timetable`
 
