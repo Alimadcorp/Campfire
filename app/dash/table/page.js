@@ -258,7 +258,7 @@ export default function TablePage() {
           else if (col === "ec2")
             val = `${p.emergencyContact2Name} (${p.emergencyContact2Phone}) [${p.emergencyContact2Relationship}]`;
 
-          return `"${String(val || "").replace(/"/g, '""')}"`;
+          return `"${String(val || "")}"`;
         })
         .join(",");
     });
