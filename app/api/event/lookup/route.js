@@ -33,6 +33,7 @@ export async function GET(request) {
           time: signup.createdTime,
           disabled: signup.disabled,
           volunteer: signup.isVolunteer,
+          checkedin: signup.checkinCompleted
         };
       }
       output.results.push({
@@ -40,6 +41,7 @@ export async function GET(request) {
         time: signup.createdTime,
         disabled: signup.disabled,
         volunteer: signup.isVolunteer,
+        checkedin: signup.checkinCompleted
       });
     }
   }

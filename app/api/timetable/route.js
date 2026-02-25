@@ -2,8 +2,8 @@ import { Redis } from '@upstash/redis'
 import { NextResponse } from 'next/server'
 
 const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    url: process.env.ADMIN_REDIS,
+    token: process.env.ADMIN_REDIS_TOKEN,
 })
 
 const TIMETABLE_KEY = 'campfire:timetable:tasks'

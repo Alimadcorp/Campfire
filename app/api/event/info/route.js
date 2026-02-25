@@ -91,6 +91,11 @@ export async function GET() {
     mostRecentName: mostRecentName.trim(),
     signupTimes: signupsData.map((s) => s.createdTime),
     referrals: signupsData.map((s) => s.referralContext),
+    checkins: signupsData.filter((s) => s.checkinCompleted).length,
+    dietaryRestrictions: signupsData.map((s) => s.dietaryRestrictions).filter(Boolean),
+    shirtSizes: signupsData.map((s) => s.shirtSize).filter(Boolean),
+    accommodations: signupsData.map((s) => s.additionalAccommodations).filter(Boolean),
+    finalCheckins: Object.keys(allData.fillout).length,
   };
   filtered.participants = participants;
   filtered.lastUpdated = allData.lastUpdated;

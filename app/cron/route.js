@@ -13,6 +13,9 @@ export async function GET(request) {
   const bkp = searchParams.get("bkp");
   const pwd = searchParams.get("pwd");
   if (pwd !== process.env.NEXT_PUBLIC_CRON_SECRET) return new Response("Unauthorized");
+
+  // Authorized
+
   const event = await fetch(`${cockpit}/api/events/${id}`, {
     headers: {
       "Content-Type": "application/json",
@@ -25,13 +28,49 @@ export async function GET(request) {
       Authorization: `Bearer ${token}`,
     },
   });
+  const fillout = await fetch("https://api.fillout.com/v1/api/forms/mP1AczzxTous/submissions", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.FILLOUT_TOKEN}`,
+    },
+  });
   const data = await event.json();
   const participantsData = await participants.json();
+  const filloutData = await fillout.json();
+  let filloutSave = [];
+  for (let i = 0; i < filloutData.responses.length; i++) {
+    const response = filloutData.responses[i];
+    const id = response.urlParameters[1].value;
+    let save = { id };
+    for (let i = 0; i < response.questions.length; i++) {
+      const question = response.questions[i];
+      if (question.name === "Your Email") {
+        save.emailC = question.value;
+      }
+      if (question.name === "CNIC") {
+        save.cnic = question.value;
+      }
+      if (question.name === "Game dev experience") {
+        save.exp = question.value;
+      }
+      if (question.name === "Game engine") {
+        save.engine = question.value;
+      }
+      if (question.name === "Discord username") {
+        save.discord = question.value;
+      }
+      if (question.name === "What are your team member's names?") {
+        save.team = question.value;
+      }
+    }
+    filloutSave.push(save);
+  }
   redis.set(
     `event`,
     JSON.stringify({
       event: data,
       participants: participantsData,
+      fillout: filloutSave,
       lastUpdated: new Date().toISOString(),
     }),
   );
@@ -41,6 +80,7 @@ export async function GET(request) {
       JSON.stringify({
         event: data,
         participants: participantsData,
+        fillout: filloutSave,
         lastUpdated: new Date().toISOString(),
       }),
     );

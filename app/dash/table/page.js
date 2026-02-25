@@ -27,9 +27,11 @@ export default function TablePage() {
     disabled: null,
     pending: null,
     cin: null,
+    fillout: null,
   });
   const [customFilters, setCustomFilters] = useState([]);
   const [visibleCols, setVisibleCols] = useState({
+    id: true,
     name: true,
     email: true,
     phone: true,
@@ -45,6 +47,13 @@ export default function TablePage() {
     ec1: false,
     ec2: false,
     accom: false,
+    link: true,
+    cnic: false,
+    exp: false,
+    engine: false,
+    discord: false,
+    team: false,
+    notes: true,
   });
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(100);
@@ -59,6 +68,21 @@ export default function TablePage() {
     return {};
   });
   const [markFilter, setMarkFilter] = useState(null);
+  const [notes, setNotes] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return JSON.parse(localStorage.getItem("participantNotes") || "{}");
+      } catch {
+        return {};
+      }
+    }
+    return {};
+  });
+
+  const [afterTime, setAfterTime] = useState("");
+  const [beforeTime, setBeforeTime] = useState("");
+  const [resendState, setResendState] = useState({});
+  const [isResending, setIsResending] = useState(false);
 
   function stripCountryCode(val) {
     if (!val) return val;
@@ -108,6 +132,31 @@ export default function TablePage() {
     fetchMarksFromRedis();
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("participantNotes", JSON.stringify(notes));
+    }
+  }, [notes]);
+
+  useEffect(() => {
+    async function fetchNotesFromRedis() {
+      try {
+        const res = await fetch("/api/event/notes");
+        if (res.ok) {
+          const remoteNotes = await res.json();
+          if (remoteNotes && typeof remoteNotes === "object") {
+            setNotes(remoteNotes);
+            if (typeof window !== "undefined") {
+              localStorage.setItem("participantNotes", JSON.stringify(remoteNotes));
+            }
+          }
+        }
+      } catch (e) {
+      }
+    }
+    fetchNotesFromRedis();
+  }, []);
+
   const toggleMark = (id) => {
     setMarks((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -138,17 +187,22 @@ export default function TablePage() {
   const mostCommonPronoun =
     Object.entries(pronounCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
 
-  const getStatusColor = (p) => {
-    if (p.disabled) return "bg-red-500/15 border-l-4 border-red-500";
-    if (p.isVolunteer) return "bg-green-500/15 border-l-4 border-green-500";
-    if (p.pendingVolunteer)
-      return "bg-yellow-500/15 border-l-4 border-yellow-500";
-    if (p.pendingDisable)
-      return "bg-orange-500/15 border-l-4 border-orange-500";
-    return "bg-blue-500/15 border-l-4 border-blue-500";
-  };
+  const enhancedParticipants = data.participants.map(p => {
+    const f = data.fillout?.find(x => String(x.id) === String(p.id)) || data.fillout?.find(x => x.emailC === p.email);
+    const pNotes = notes[p.id] || [];
+    return {
+      ...p,
+      hasFillout: !!f,
+      cnic: f?.cnic || "",
+      discord: f?.discord || "",
+      engine: f?.engine || "",
+      exp: f?.exp || "",
+      team: f?.team || "",
+      notesStr: pNotes.join(" "),
+    };
+  });
 
-  let filtered = data.participants.filter((p) => {
+  let filtered = enhancedParticipants.filter((p) => {
     const matchesSearch =
       p.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -162,6 +216,7 @@ export default function TablePage() {
       (filters.volunteer === null || p.isVolunteer === filters.volunteer) &&
       (filters.disabled === null || p.disabled === filters.disabled) &&
       (filters.cin === null || p.checkinCompleted === filters.cin) &&
+      (filters.fillout === null || p.hasFillout === filters.fillout) &&
       (filters.pending === null ||
         (filters.pending === true &&
           (p.pendingVolunteer || p.pendingDisable)) ||
@@ -187,7 +242,11 @@ export default function TablePage() {
       return f.type === "SELECT" ? match : !match;
     });
 
-    return matchesSearch && matchesFilters && matchesMark && matchesCustom;
+    const pDate = new Date(p.createdTime);
+    const matchesAfter = afterTime ? pDate >= new Date(afterTime) : true;
+    const matchesBefore = beforeTime ? pDate <= new Date(beforeTime) : true;
+
+    return matchesSearch && matchesFilters && matchesMark && matchesCustom && matchesAfter && matchesBefore;
   });
 
   const handleSort = (key) => {
@@ -223,16 +282,19 @@ export default function TablePage() {
   );
 
   function exportCSV() {
-    const activeCols = Object.entries(visibleCols)
+    let activeCols = Object.entries(visibleCols)
       .filter(([_, visible]) => visible)
-      .map(([col]) => col);
+      .map(([col]) => col)
+    console.log(activeCols);
 
     const header = activeCols.join(",");
     const rows = sortedFiltered.map((p) => {
       return activeCols
         .map((col) => {
           let val = "";
-          if (col === "name") val = p.displayName;
+          if (col === "id") val = p.id;
+          else if (col === "name") val = p.displayName;
+          else if (col === "link") val = `https://alimad.fillout.com/campfire?email=${p.email}&id=${p.id}`;
           else if (col === "email") val = p.email;
           else if (col === "phone") val = p.phone;
           else if (col === "pronouns") val = p.pronouns;
@@ -257,6 +319,12 @@ export default function TablePage() {
             val = `${p.emergencyContact1Name} (${p.emergencyContact1Phone}) [${p.emergencyContact1Relationship}]`;
           else if (col === "ec2")
             val = `${p.emergencyContact2Name} (${p.emergencyContact2Phone}) [${p.emergencyContact2Relationship}]`;
+          else if (col === "cnic") val = p.cnic;
+          else if (col === "discord") val = p.discord;
+          else if (col === "engine") val = p.engine;
+          else if (col === "exp") val = p.exp;
+          else if (col === "team") val = p.team;
+          else if (col === "notes") val = p.notesStr;
 
           return `"${String(val || "")}"`;
         })
@@ -280,6 +348,57 @@ export default function TablePage() {
       body: JSON.stringify(marks),
     });
   }
+
+  async function syncNotesToRedis(updatedNotes) {
+    await fetch("/api/event/notes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedNotes || notes),
+    });
+  }
+
+  const addNote = (id, text) => {
+    if (!text.trim()) return;
+    const newNotes = { ...notes };
+    if (!newNotes[id]) newNotes[id] = [];
+    newNotes[id].push(text.trim());
+    setNotes(newNotes);
+    syncNotesToRedis(newNotes);
+  };
+
+  const removeNote = (id, index) => {
+    const newNotes = { ...notes };
+    if (!newNotes[id]) return;
+    newNotes[id].splice(index, 1);
+    setNotes(newNotes);
+    syncNotesToRedis(newNotes);
+  };
+
+  const resendAll = async () => {
+    if (!confirm(`Are you sure you want to resend emails to ${sortedFiltered.length} signups?`)) return;
+    setIsResending(true);
+    let tmp = { ...resendState };
+    for (const p of sortedFiltered) {
+      tmp[p.id] = 'pending';
+    }
+    setResendState({ ...tmp });
+
+    for (const p of sortedFiltered) {
+      try {
+        const res = await fetch("https://cockpit.hackclub.com/#/resent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: p.email })
+        });
+        tmp[p.id] = res.ok ? 'success' : 'error';
+      } catch (e) {
+        // if mode no-cors or fetch fails due to CORS, it might throw, but let's assume network success = success depending on usage
+        tmp[p.id] = 'error';
+      }
+      setResendState({ ...tmp });
+    }
+    setIsResending(false);
+  };
 
   function CopyCell({ value, children, strip }) {
     const [copied, setCopied] = useState(false);
@@ -333,18 +452,40 @@ export default function TablePage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full mb-2 px-3 py-2 bg-black border border-cyan-700/40 rounded text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-cyan-600 text-sm font-mono"
             />
+            <div className="flex gap-2 mb-2">
+              <div className="flex flex-col flex-1">
+                <span className="text-[10px] text-white/50 uppercase font-bold">After:</span>
+                <input
+                  type="datetime-local"
+                  value={afterTime}
+                  onChange={(e) => setAfterTime(e.target.value)}
+                  className="w-full bg-black border border-white/20 rounded px-2 py-1 text-xs text-white outline-none focus:border-cyan-600"
+                />
+              </div>
+              <div className="flex flex-col flex-1">
+                <span className="text-[10px] text-white/50 uppercase font-bold">Before:</span>
+                <input
+                  type="datetime-local"
+                  value={beforeTime}
+                  onChange={(e) => setBeforeTime(e.target.value)}
+                  className="w-full bg-black border border-white/20 rounded px-2 py-1 text-xs text-white outline-none focus:border-cyan-600"
+                />
+              </div>
+            </div>
             <div className="flex gap-1 flex-wrap mb-2">
               {{
                 volunteer: "VOL",
                 disabled: "DIS",
                 pending: "PND",
                 cin: "CIN",
+                fillout: "FIL",
               } &&
                 Object.entries({
                   volunteer: "VOL",
                   disabled: "DIS",
                   pending: "PND",
                   cin: "CIN",
+                  fillout: "FIL",
                 }).map(([key, label]) => (
                   <button
                     key={key}
@@ -396,9 +537,11 @@ export default function TablePage() {
               </button>
               <button
                 onClick={() => {
-                  setFilters({ volunteer: null, disabled: null, pending: null, cin: null });
+                  setFilters({ volunteer: null, disabled: null, pending: null, cin: null, fillout: null });
                   setCustomFilters([]);
                   setMarkFilter(null);
+                  setAfterTime("");
+                  setBeforeTime("");
                 }}
                 className="px-2 py-1 rounded text-xs font-bold uppercase tracking-wider bg-black border border-white/10 text-white/40 hover:text-white/70 transition-all"
               >
@@ -448,6 +591,12 @@ export default function TablePage() {
                     <option value="shirtSize">Shirt</option>
                     <option value="dietaryRestrictions">Diet</option>
                     <option value="additionalAccommodations">Accom</option>
+                    <option value="cnic">CNIC</option>
+                    <option value="discord">Discord</option>
+                    <option value="engine">Engine</option>
+                    <option value="exp">Experience</option>
+                    <option value="team">Team</option>
+                    <option value="notesStr">Notes</option>
                   </select>
                   <select
                     value={f.operator}
@@ -484,7 +633,14 @@ export default function TablePage() {
               ))}
             </div>
           </div>
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center flex-wrap justify-end">
+            <button
+              className="px-2 py-1 rounded bg-yellow-700 text-white text-xs font-bold hover:bg-yellow-800 disabled:opacity-50"
+              onClick={resendAll}
+              disabled={isResending}
+            >
+              {isResending ? "RESENDING..." : "RESEND ALL"}
+            </button>
             <button
               className="px-2 py-1 rounded bg-cyan-700 text-white text-xs font-bold hover:bg-cyan-800"
               onClick={exportCSV}
@@ -539,6 +695,15 @@ export default function TablePage() {
                   >
                     #
                   </th>
+                  {visibleCols.id && (
+                    <th
+                      className={`px-2 py-2 font-bold uppercase tracking-wider text-cyan-400 cursor-pointer ${sortBy === "id" ? "bg-cyan-900" : ""
+                        }`}
+                      onClick={() => handleSort("id")}
+                    >
+                      ID
+                    </th>
+                  )}
                   {visibleCols.name && (
                     <th
                       className={`px-2 py-2 font-bold uppercase tracking-wider text-cyan-400 cursor-pointer ${sortBy === "displayName" ? "bg-cyan-900" : ""
@@ -638,13 +803,45 @@ export default function TablePage() {
                       EC2
                     </th>
                   )}
+                  {visibleCols.cnic && (
+                    <th className="px-2 py-2 font-bold uppercase tracking-wider text-slate-400">
+                      CNIC
+                    </th>
+                  )}
+                  {visibleCols.discord && (
+                    <th className="px-2 py-2 font-bold uppercase tracking-wider text-[#5865F2]">
+                      Discord
+                    </th>
+                  )}
+                  {visibleCols.engine && (
+                    <th className="px-2 py-2 font-bold uppercase tracking-wider text-rose-400">
+                      Engine
+                    </th>
+                  )}
+                  {visibleCols.exp && (
+                    <th className="px-2 py-2 font-bold uppercase tracking-wider text-amber-400">
+                      Exp
+                    </th>
+                  )}
+                  {visibleCols.team && (
+                    <th className="px-2 py-2 font-bold uppercase tracking-wider text-fuchsia-400">
+                      Team
+                    </th>
+                  )}
+                  {visibleCols.notes && (
+                    <th className="px-2 py-2 font-bold uppercase tracking-wider text-lime-400">
+                      Notes
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {pagedFiltered.map((p, i) => (
                   <tr
                     key={p.id}
-                    className={`bg-black border-b border-white/5 transition-all duration-150 hover:bg-white/10 cursor-text ${p.checkinCompleted ? "bg-green-500/5" : ""}`}
+                    className={`bg-black border-b border-white/5 transition-all duration-150 hover:bg-white/10 cursor-text ${resendState[p.id] === 'pending' ? 'bg-yellow-900/40' :
+                      p.checkinCompleted ? "bg-green-500/5" : ""
+                      }`}
                   >
                     <td className="px-2 py-2 text-xs font-bold text-white/50">
                       {String(i + 1 + (page - 1) * rowsPerPage).padStart(
@@ -652,10 +849,10 @@ export default function TablePage() {
                         "0",
                       )}
                     </td>
-                    {visibleCols.name && (
-                      <CopyCell value={p.displayName} strip={false}>
+                    {visibleCols.id && (
+                      <CopyCell value={p.id} strip={false}>
                         <Tooltip
-                          text={p.legalFirstName + " " + p.legalLastName}
+                          text={p.displayName}
                         >
                           <span
                             className={
@@ -663,7 +860,25 @@ export default function TablePage() {
                               (p.disabled ? " text-red-400" : " text-white")
                             }
                           >
+                            {p.id}
+                          </span>
+                        </Tooltip>
+                      </CopyCell>
+                    )}
+                    {visibleCols.name && (
+                      <CopyCell value={p.displayName} strip={false}>
+                        <Tooltip
+                          text={p.legalFirstName + " " + p.legalLastName}
+                        >
+                          <span
+                            className={
+                              "font-bold text-xs flex items-center gap-1" +
+                              (p.disabled ? " text-red-400" : " text-white")
+                            }
+                          >
                             {p.displayName}
+                            {resendState[p.id] === 'success' && <Check size={14} className="text-green-500" />}
+                            {resendState[p.id] === 'error' && <span className="text-red-500 font-bold ml-1 text-[10px]">X</span>}
                           </span>
                         </Tooltip>
                       </CopyCell>
@@ -672,9 +887,7 @@ export default function TablePage() {
                       <CopyCell value={p.email} strip={true}>
                         <Tooltip text={p.email}>
                           <span className="text-white/70 text-xs">
-                            {p.email.length > 28
-                              ? p.email.substring(0, 25) + "..."
-                              : p.email}
+                            {p.email}
                           </span>
                         </Tooltip>
                       </CopyCell>
@@ -765,7 +978,7 @@ export default function TablePage() {
                     {visibleCols.ref && (
                       <CopyCell value={p.referralContext} strip={false}>
                         <Tooltip text={p.referralContext}>
-                          <span className="text-white/60 text-xs max-w-xs truncate">
+                          <span className="text-white/60 text-xs max-w-xs">
                             {p.referralContext ? p.referralContext : "—"}
                           </span>
                         </Tooltip>
@@ -795,12 +1008,12 @@ export default function TablePage() {
                     )}
                     {visibleCols.diet && (
                       <CopyCell value={p.dietaryRestrictions} strip={false}>
-                        <span className="text-white/70 text-xs max-w-[150px] truncate block">{p.dietaryRestrictions || "—"}</span>
+                        <span className="text-white/70 text-xs max-w-[150px] block">{p.dietaryRestrictions || "—"}</span>
                       </CopyCell>
                     )}
                     {visibleCols.accom && (
                       <CopyCell value={p.additionalAccommodations} strip={false}>
-                        <span className="text-white/70 text-xs max-w-[150px] truncate block">{p.additionalAccommodations || "—"}</span>
+                        <span className="text-white/70 text-xs max-w-[150px] block">{p.additionalAccommodations || "—"}</span>
                       </CopyCell>
                     )}
                     {visibleCols.ec1 && (
@@ -822,6 +1035,81 @@ export default function TablePage() {
                           </div>
                         </Tooltip>
                       </CopyCell>
+                    )}
+                    {visibleCols.cnic && (
+                      <CopyCell value={p.cnic} strip={false}>
+                        <span className="text-white/70 text-xs">{p.cnic || "—"}</span>
+                      </CopyCell>
+                    )}
+                    {visibleCols.discord && (
+                      <CopyCell value={p.discord} strip={false}>
+                        <span className="text-white/70 text-xs">{p.discord || "—"}</span>
+                      </CopyCell>
+                    )}
+                    {visibleCols.engine && (
+                      <CopyCell value={p.engine} strip={false}>
+                        <span className="text-white/70 text-xs">{p.engine || "—"}</span>
+                      </CopyCell>
+                    )}
+                    {visibleCols.exp && (
+                      <td className="px-2 py-2">
+                        <Tooltip text={p.exp || "—"}>
+                          <div className="w-16 sm:w-24 h-2 bg-white/10 rounded overflow-hidden mt-1 cursor-help">
+                            <div
+                              className="h-full bg-amber-400"
+                              style={{ width: !isNaN(parseInt(p.exp)) ? `${Math.min(100, parseInt(p.exp) * 10)}%` : "0%" }}
+                            ></div>
+                          </div>
+                        </Tooltip>
+                      </td>
+                    )}
+                    {visibleCols.team && (
+                      <td className="px-2 py-2">
+                        <div className="flex flex-wrap gap-1 max-w-[200px]">
+                          {p.team ? p.team.split(',').map((t, idx) => (
+                            <span key={idx} className="bg-fuchsia-900/40 border border-fuchsia-700/50 text-fuchsia-200 px-1 py-0.5 rounded text-[10px] whitespace-nowrap">
+                              {t.trim()}
+                            </span>
+                          )) : "—"}
+                        </div>
+                      </td>
+                    )}
+                    {visibleCols.notes && (
+                      <td className="px-2 py-2 min-w-[200px]" onClick={e => e.stopPropagation()}>
+                        <div className="flex flex-col gap-1">
+                          {(notes[p.id] || []).map((note, idx) => (
+                            <div key={idx} className="flex items-start gap-1 group">
+                              <span className="flex-1 bg-lime-900/30 border border-lime-700/40 text-lime-200 px-1.5 py-0.5 rounded text-[10px] break-words">
+                                {note}
+                              </span>
+                              <button
+                                onClick={() => removeNote(p.id, idx)}
+                                className="text-red-500 hover:text-red-400 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                [X]
+                              </button>
+                            </div>
+                          ))}
+                          <form
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              const input = e.target.elements.noteInput;
+                              if (input.value) {
+                                addNote(p.id, input.value);
+                                input.value = '';
+                              }
+                            }}
+                            className="mt-1"
+                          >
+                            <input
+                              name="noteInput"
+                              type="text"
+                              placeholder="+ note..."
+                              className="w-full bg-black border border-white/20 rounded px-1.5 py-0.5 text-[10px] text-white outline-none focus:border-lime-500/50"
+                            />
+                          </form>
+                        </div>
+                      </td>
                     )}
                   </tr>
                 ))}
@@ -886,6 +1174,6 @@ export default function TablePage() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
