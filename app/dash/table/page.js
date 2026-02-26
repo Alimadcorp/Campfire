@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Clipboard, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { format as timeago } from "timeago.js";
+import orgs from "@/lib/orgs";
+const ADWIN = "U08LQFRBL6S";
 
 function Tooltip({ text, children }) {
   return (
@@ -84,6 +86,41 @@ export default function TablePage() {
   const [resendState, setResendState] = useState({});
   const [isResending, setIsResending] = useState(false);
 
+  const [activeSiteUsers, setActiveSiteUsers] = useState(0);
+  const [activeAdmins, setActiveAdmins] = useState([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then(r => r.json())
+      .then(sess => {
+        if (sess && sess.user) setUser(sess.user);
+      })
+      .catch(e => console.error(e));
+  }, []);
+
+  useEffect(() => {
+    async function fetchRealtime() {
+      try {
+        const pingRes = await fetch("https://live.alimad.co/ping?app=campfire");
+        const pingText = await pingRes.text();
+        setActiveSiteUsers(parseInt(pingText) || 0);
+
+        const activeRes = await fetch("/api/event/active");
+        if (activeRes.ok) {
+          const { activeAdmins } = await activeRes.json();
+          setActiveAdmins(activeAdmins || []);
+        }
+      } catch (e) {
+        console.error("Realtime fetch error:", e);
+      }
+    }
+
+    fetchRealtime();
+    const interval = setInterval(fetchRealtime, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   function stripCountryCode(val) {
     if (!val) return val;
     return val.replace(/^\+92/, "").replace(/^\+10/, "").replace(/^\+1/, "");
@@ -155,6 +192,8 @@ export default function TablePage() {
       }
     }
     fetchNotesFromRedis();
+    const interval = setInterval(fetchNotesFromRedis, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const toggleMark = (id) => {
@@ -198,7 +237,7 @@ export default function TablePage() {
       engine: f?.engine || "",
       exp: f?.exp || "",
       team: f?.team || "",
-      notesStr: pNotes.join(" "),
+      notesStr: pNotes.map(n => typeof n === "string" ? n : n.text).join(" "),
     };
   });
 
@@ -341,6 +380,24 @@ export default function TablePage() {
     URL.revokeObjectURL(url);
   }
 
+  function exportCNICs() {
+    let textOut = "";
+    sortedFiltered.forEach(p => {
+      if (p.cnic) {
+        textOut += `${p.legalFirstName || p.displayName.split(" ")[0]} ${p.legalLastName || ""}\n`;
+        textOut += `${p.phone || ""}\n`;
+        textOut += `${p.cnic || ""}\n\n`;
+      }
+    });
+    const blob = new Blob([textOut], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `cnics_export_${new Date().toISOString().split("T")[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   async function syncMarksToRedis() {
     await fetch("/api/event/ids", {
       method: "POST",
@@ -349,29 +406,35 @@ export default function TablePage() {
     });
   }
 
-  async function syncNotesToRedis(updatedNotes) {
-    await fetch("/api/event/notes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedNotes || notes),
-    });
-  }
-
-  const addNote = (id, text) => {
+  const addNote = async (id, text) => {
     if (!text.trim()) return;
-    const newNotes = { ...notes };
-    if (!newNotes[id]) newNotes[id] = [];
-    newNotes[id].push(text.trim());
-    setNotes(newNotes);
-    syncNotesToRedis(newNotes);
+    try {
+      const res = await fetch("/api/event/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "add", id, text }),
+      });
+      if (res.ok) {
+        const remoteNotes = await res.json();
+        setNotes(remoteNotes);
+      }
+    } catch (e) { }
   };
 
-  const removeNote = (id, index) => {
-    const newNotes = { ...notes };
-    if (!newNotes[id]) return;
-    newNotes[id].splice(index, 1);
-    setNotes(newNotes);
-    syncNotesToRedis(newNotes);
+  const removeNote = async (id, index) => {
+    try {
+      const res = await fetch("/api/event/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", id, index }),
+      });
+      if (res.ok) {
+        const remoteNotes = await res.json();
+        setNotes(remoteNotes);
+      } else {
+        alert("Failed to delete note or unauthorized.");
+      }
+    } catch (e) { }
   };
 
   const resendAll = async () => {
@@ -385,14 +448,19 @@ export default function TablePage() {
 
     for (const p of sortedFiltered) {
       try {
-        const res = await fetch("https://cockpit.hackclub.com/#/resent", {
+        const res = await fetch("/api/event/resend", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ email: p.email })
         });
-        tmp[p.id] = res.ok ? 'success' : 'error';
+        if (res.ok) {
+          tmp[p.id] = 'success';
+        } else {
+          tmp[p.id] = 'error';
+        }
       } catch (e) {
-        // if mode no-cors or fetch fails due to CORS, it might throw, but let's assume network success = success depending on usage
         tmp[p.id] = 'error';
       }
       setResendState({ ...tmp });
@@ -412,6 +480,16 @@ export default function TablePage() {
           setCopied(true);
           setTimeout(() => setCopied(false), 1200);
         }}
+        onContextMenu={(e) => {
+          if(!strip) return;
+          e.preventDefault();
+          window.open(
+            `https://wa.me/${value}?text=AOA`,
+            "_blank"
+          );
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1200);
+        }}
         title="Click to copy"
       >
         <span className="flex items-center gap-1">
@@ -427,9 +505,36 @@ export default function TablePage() {
       <div className="w-full h-full">
         <div className="mb-2 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-1 tracking-tight">
-              SIGNUPS
-            </h1>
+            <div className="flex items-center gap-4 mb-1">
+              <h1 className="text-3xl font-bold text-white tracking-tight">
+                SIGNUPS
+              </h1>
+              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full px-2 py-1 mt-1">
+                <div className="flex items-center gap-1.5" title="Currently active users on Campfire Site">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                  <span className="text-sm font-bold text-white">Online: <span className="text-green-400">{activeSiteUsers}</span></span>
+                </div>
+                {activeAdmins && activeAdmins.length > 0 && (
+                  <>
+                    <div className="w-px h-4 bg-white/20"></div>
+                    <div className="flex items-center -space-x-1.5 ml-1">
+                      {activeAdmins.map((admin) => {
+                        const info = orgs[admin.id] || orgs["default"];
+                        return (
+                          <Tooltip key={admin.id} text={`${info.name || admin.name} (${info.role || "Admin"})`}>
+                            <img
+                              src={admin.image || "https://api.dicebear.com/7.x/avataaars/svg"}
+                              alt={info.name || admin.name}
+                              className="w-6 h-6 rounded-full border border-black z-10 hover:z-20 relative hover:scale-125 transition-all cursor-pointer object-cover bg-black"
+                            />
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
             <p className="text-white/60 text-xs mb-2 tracking-wide">
               {filtered.length} results • last updated:{" "}
               {new Date(data.lastUpdated).toLocaleString()} (
@@ -641,12 +746,22 @@ export default function TablePage() {
             >
               {isResending ? "RESENDING..." : "RESEND ALL"}
             </button>
-            <button
-              className="px-2 py-1 rounded bg-cyan-700 text-white text-xs font-bold hover:bg-cyan-800"
-              onClick={exportCSV}
-            >
-              Export CSV
-            </button>
+            {user?.slackId === ADWIN && (
+              <>
+                <button
+                  className="px-2 py-1 rounded bg-cyan-700 text-white text-xs font-bold hover:bg-cyan-800"
+                  onClick={exportCSV}
+                >
+                  Export CSV
+                </button>
+                <button
+                  className="px-2 py-1 rounded bg-green-700 text-white text-xs font-bold hover:bg-green-800"
+                  onClick={exportCNICs}
+                >
+                  Export CNICs
+                </button>
+              </>
+            )}
             <button
               className="px-2 py-1 rounded bg-blue-700 text-white text-xs font-bold hover:bg-blue-800"
               onClick={syncMarksToRedis}
@@ -771,6 +886,11 @@ export default function TablePage() {
                   {visibleCols.mark && (
                     <th className="px-2 py-2 font-bold uppercase tracking-wider text-blue-400">
                       Mark
+                    </th>
+                  )}
+                  {visibleCols.link && (
+                    <th className="px-2 py-2 font-bold uppercase tracking-wider text-purple-300">
+                      Link
                     </th>
                   )}
                   {visibleCols.cin && (
@@ -994,6 +1114,13 @@ export default function TablePage() {
                         </button>
                       </td>
                     )}
+                    {visibleCols.link && (
+                      <CopyCell value={`https://alimad.fillout.com/campfire?id=${p.id}&email=${p.email}`} strip={false}>
+                        <Tooltip text="Copy Fillout Link">
+                          <span className="text-purple-300 font-bold underline text-xs cursor-pointer">LINK</span>
+                        </Tooltip>
+                      </CopyCell>
+                    )}
                     {visibleCols.cin && (
                       <td className="px-2 py-2 text-center">
                         <span className={`px-2 py-1 rounded font-bold text-[10px] ${p.checkinCompleted ? "bg-green-700 text-white" : "bg-white/5 text-white/20"}`}>
@@ -1077,19 +1204,32 @@ export default function TablePage() {
                     {visibleCols.notes && (
                       <td className="px-2 py-2 min-w-[200px]" onClick={e => e.stopPropagation()}>
                         <div className="flex flex-col gap-1">
-                          {(notes[p.id] || []).map((note, idx) => (
-                            <div key={idx} className="flex items-start gap-1 group">
-                              <span className="flex-1 bg-lime-900/30 border border-lime-700/40 text-lime-200 px-1.5 py-0.5 rounded text-[10px] break-words">
-                                {note}
-                              </span>
-                              <button
-                                onClick={() => removeNote(p.id, idx)}
-                                className="text-red-500 hover:text-red-400 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                [X]
-                              </button>
-                            </div>
-                          ))}
+                          {(notes[p.id] || []).map((note, idx) => {
+                            const isObj = typeof note === "object";
+                            const text = isObj ? note.text : note;
+                            const author = isObj ? note.author : "Unknown";
+                            const avatar = isObj ? note.avatar : "https://api.dicebear.com/7.x/avataaars/svg";
+                            return (
+                              <div key={idx} className="flex items-start gap-1 group relative">
+                                {isObj && (
+                                  <Tooltip text={author}>
+                                    <img src={avatar} className="w-4 h-4 rounded-full border border-white/20 object-cover mt-[2px]" alt={author} />
+                                  </Tooltip>
+                                )}
+                                <span className="flex-1 bg-lime-900/30 border border-lime-700/40 text-lime-200 px-1.5 py-0.5 rounded text-[10px] break-words">
+                                  {text}
+                                </span>
+                                {user?.slackId === ADWIN && (
+                                  <button
+                                    onClick={() => removeNote(p.id, idx)}
+                                    className="text-red-500 hover:text-red-400 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    [X]
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
                           <form
                             onSubmit={(e) => {
                               e.preventDefault();

@@ -12,7 +12,8 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const bkp = searchParams.get("bkp");
   const pwd = searchParams.get("pwd");
-  if (pwd !== process.env.NEXT_PUBLIC_CRON_SECRET) return new Response("Unauthorized");
+  if (pwd !== process.env.NEXT_PUBLIC_CRON_SECRET)
+    return new Response("Unauthorized");
 
   // Authorized
 
@@ -28,15 +29,25 @@ export async function GET(request) {
       Authorization: `Bearer ${token}`,
     },
   });
-  const fillout = await fetch("https://api.fillout.com/v1/api/forms/mP1AczzxTous/submissions", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.FILLOUT_TOKEN}`,
+  const fillout = await fetch(
+    "https://api.fillout.com/v1/api/forms/mP1AczzxTous/submissions?limit=150",
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.FILLOUT_TOKEN}`,
+      },
     },
-  });
+  );
   const data = await event.json();
-  const participantsData = await participants.json();
+  let participantsData = await participants.json();
+  for (let i = 0; i < participantsData.length; i++) {
+    participantsData[i].phone = participantsData[i].phone
+      .replace(/^\+10?/, "+92")
+      .replace(/^\+920?/, "+92")
+      .replace(/["\(\)\-\s]/g, "");
+  }
   const filloutData = await fillout.json();
+  console.log(filloutData.responses.length);
   let filloutSave = [];
   for (let i = 0; i < filloutData.responses.length; i++) {
     const response = filloutData.responses[i];
@@ -48,7 +59,7 @@ export async function GET(request) {
         save.emailC = question.value;
       }
       if (question.name === "CNIC") {
-        save.cnic = question.value;
+        save.cnic = question.value.replaceAll("-", "");
       }
       if (question.name === "Game dev experience") {
         save.exp = question.value;
@@ -84,5 +95,5 @@ export async function GET(request) {
         lastUpdated: new Date().toISOString(),
       }),
     );
-  return new Response("Success");
+  return Response("Success");
 }

@@ -79,6 +79,13 @@ export async function GET() {
       }
     }
   });
+  let uniqueCnic = new Set();
+  allData.fillout.forEach((signup) => {
+    if (signup.cnic) {
+      uniqueCnic.add(signup.cnic);
+    }
+  });
+  let final = uniqueCnic.size;
   let participants = {
     total: signupsData.length,
     deleted,
@@ -95,7 +102,7 @@ export async function GET() {
     dietaryRestrictions: signupsData.map((s) => s.dietaryRestrictions).filter(Boolean),
     shirtSizes: signupsData.map((s) => s.shirtSize).filter(Boolean),
     accommodations: signupsData.map((s) => s.additionalAccommodations).filter(Boolean),
-    finalCheckins: Object.keys(allData.fillout).length,
+    finalCheckins: final,
   };
   filtered.participants = participants;
   filtered.lastUpdated = allData.lastUpdated;

@@ -11,7 +11,7 @@ export async function GET() {
   if (!session || !session.user) {
     return Response.json({ error: "Not authenticated." }, { status: 401 });
   }
-  const allowedSlackIds = ["U08LQFRBL6S"];
+  const allowedSlackIds = ["U08LQFRBL6S", "U07UGRYER5G"]//, "U0A9FR997HU", "U09DRCKD0LT", "U09DTPWN726", "U07UGRYER5G", "U08RS7AEA77", "U0AAKAT78TD"]
   if (!allowedSlackIds.includes(session.user.slackId)) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
