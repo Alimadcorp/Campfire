@@ -381,14 +381,74 @@ export default function TablePage() {
   }
 
   function exportCNICs() {
-    let textOut = "";
-    sortedFiltered.forEach(p => {
-      if (p.cnic) {
-        textOut += `${p.legalFirstName || p.displayName.split(" ")[0]} ${p.legalLastName || ""}\n`;
-        textOut += `${p.phone || ""}\n`;
-        textOut += `${p.cnic || ""}\n\n`;
+    const sorted = [...sortedFiltered].sort((a, b) => {
+      const nameA = `${a.legalFirstName || a.displayName.split(" ")[0]} ${a.legalLastName || ""}`.trim().toLowerCase();
+      const nameB = `${b.legalFirstName || b.displayName.split(" ")[0]} ${b.legalLastName || ""}`.trim().toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+
+    const withCnic = sorted.filter(p => p.cnic);
+    const checkedNoCnic = sorted.filter(p => !p.cnic && p.checkinCompleted);
+
+    const seenCnics = new Map();
+    const duplicates = [];
+    const getName = p => `${p.legalFirstName.trim() || p.displayName.split(" ")[0]} ${p.legalLastName.trim() || ""}`.trim().toLowerCase();
+    const getPhone = p => (p.phone || "").trim();
+
+    withCnic.forEach(p => {
+      const key = p.cnic.trim();
+      if (!seenCnics.has(key)) {
+        seenCnics.set(key, p);
+      } else {
+        const original = seenCnics.get(key);
+        const samePerson = getName(original) === getName(p) && getPhone(original) === getPhone(p);
+        if (!samePerson) {
+          duplicates.push({ cnic: key, original, dupe: p });
+        }
       }
     });
+
+    const uniqueWithCnic = [...seenCnics.values()];
+
+    let textOut = "";
+
+    textOut += "════════════════════════════════════════\n";
+    textOut += `CAMPFIRE LAHORE PARTICIPANTS (${uniqueWithCnic.length})\n`;
+    textOut += "════════════════════════════════════════\n\n";
+
+    uniqueWithCnic.forEach(p => {
+      const name = `${p.legalFirstName.trim() || p.displayName.split(" ")[0]} ${p.legalLastName.trim() || ""}`.trim();
+      textOut += `${name}\n`;
+      textOut += `${p.phone || ""}\n`;
+      textOut += `${p.cnic}\n\n`;
+    });
+
+    if (duplicates.length > 0) {
+      textOut += "────────────────────────────────────────\n";
+      textOut += `DUPLICATES (${duplicates.length})\n`;
+      textOut += "────────────────────────────────────────\n\n";
+      duplicates.forEach(({ cnic, original, dupe }) => {
+        const origName = `${original.legalFirstName.trim() || original.displayName.split(" ")[0]} ${original.legalLastName.trim() || ""}`.trim();
+        const dupeName = `${dupe.legalFirstName.trim() || dupe.displayName.split(" ")[0]} ${dupe.legalLastName.trim() || ""}`.trim();
+        textOut += `CNIC: ${cnic}\n`;
+        textOut += `  KEPT  → ${origName} (${original.phone || ""})\n`;
+        textOut += `  DUPED → ${dupeName} (${dupe.phone || ""})\n\n`;
+      });
+    }
+    textOut += "════════════════════════════════════════\n";
+    textOut += `PARTICIPANTS WITHOUT CNIC (${checkedNoCnic.length})\n`;
+    textOut += "════════════════════════════════════════\n\n";
+
+    if (checkedNoCnic.length === 0) {
+      textOut += "(none)\n";
+    } else {
+      checkedNoCnic.forEach(p => {
+        const name = `${p.legalFirstName.trim() || p.displayName.split(" ")[0]} ${p.legalLastName.trim() || ""}`.trim();
+        textOut += `${name}\n`;
+        textOut += `${p.phone || ""}\n\n`;
+      });
+    }
+
     const blob = new Blob([textOut], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -481,7 +541,7 @@ export default function TablePage() {
           setTimeout(() => setCopied(false), 1200);
         }}
         onContextMenu={(e) => {
-          if(!strip) return;
+          if (!strip) return;
           e.preventDefault();
           window.open(
             `https://wa.me/${value}?text=AOA`,

@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 const redis = new Redis({
-  url: process.env.ADMIN_REDIS,
-  token: process.env.ADMIN_REDIS_TOKEN,
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_URL_TOKEN,
 });
 
 const MARKS_KEY = "participantMarks";
