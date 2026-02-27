@@ -28,10 +28,15 @@ export default function ParticipantCard({
                     )}
                 </div>
                 <div className="flex gap-1 flex-wrap mb-2">
-                    {p.scanned && <span className="text-[0.65rem] font-black bg-blue-400/20 text-blue-300 px-1.5 py-0.5 rounded border border-blue-400/30 shadow-[0_0_8px_rgba(96,165,250,0.2)]">SCANNED</span>}
+                    {p.scanned && <span className="text-[0.65rem] font-black bg-blue-400/20 text-blue-300 px-1.5 py-0.5 rounded border border-blue-400/30">SCANNED</span>}
                     {p.isVolunteer && <span className="text-[0.65rem] font-black bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30">VOL</span>}
                     {ORGANIZERS.includes(p.id) && <span className="text-[0.65rem] font-black bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded border border-purple-500/30">ORG</span>}
-                    {p.checkinCompleted && <span className="text-[0.65rem] font-black bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30 shadow-[0_0_8px_rgba(16,185,129,0.1)]">IN</span>}
+                    {p.checkinCompleted && !p.scanned && <span className="text-[0.65rem] font-black bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">CHECKED</span>}
+                    {p._inVenue ? (
+                        <span className="text-[0.65rem] font-black bg-emerald-500 text-black px-1.5 py-0.5 rounded shadow-[0_0_15px_rgba(16,185,129,0.3)]">IN VENUE</span>
+                    ) : (p.scanned || p.checkinCompleted) ? (
+                        <span className="text-[0.65rem] font-black bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded border border-amber-500/40">ON BREAK</span>
+                    ) : null}
                     {p.disabled && <span className="text-[0.65rem] font-black bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/30">DIS</span>}
                     {p.hasFillout && <span className="text-[0.65rem] font-black bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded border border-cyan-500/30">FIL</span>}
                 </div>

@@ -335,7 +335,8 @@ export default function ScanPage() {
         const last = vis.length ? vis[vis.length - 1] : null;
         const lastTime = last?.timestamp || last?.time || 0;
         const scanned = scannedIds.has(String(p.id));
-        return { ...p, notesStr, scanned, _meta: meta, _lastNoteTime: lastTime };
+        const inVenue = (scanned || p.checkinCompleted) ? (meta.lastTransit ? meta.inVenue : true) : false;
+        return { ...p, notesStr, scanned, _inVenue: inVenue, _meta: meta, _lastNoteTime: lastTime };
     }).filter(p => matchSearch(p, leftSearch)).filter(p => {
         if (filters.vol === true && !p.isVolunteer) return false;
         if (filters.vol === false && p.isVolunteer) return false;
@@ -381,7 +382,16 @@ export default function ScanPage() {
         return 0;
     }), [leftFiltered, sortBy]);
 
-    const venueList = useMemo(() => sortedFiltered.filter(p => p.scanned || p.checkinCompleted), [sortedFiltered]);
+    const venueList = useMemo(() => sortedFiltered.filter(p => p._inVenue), [sortedFiltered]);
+
+    const stats = useMemo(() => {
+        const total = allParts.length;
+        const scanned = allParts.filter(p => scannedIds.has(String(p.id)) || p.checkinCompleted).length;
+        const inVenue = leftFiltered.filter(p => p._inVenue).length;
+        const vStaff = leftFiltered.filter(p => p._inVenue && p.isVolunteer).length;
+        const vParts = inVenue - vStaff;
+        return { total, scanned, inVenue, vStaff, vParts, out: scanned - inVenue };
+    }, [allParts, scannedIds, leftFiltered]);
 
     useEffect(() => { setPage(0); }, [leftSearch, filters, customFilters, sortBy, leftMode]);
 
@@ -517,7 +527,7 @@ export default function ScanPage() {
                 setPage={setPage} sortedTeams={sortedTeams} teamGroups={teamGroups}
                 showTimestamps={showTimestamps} setShowTimestamps={setShowTimestamps}
                 timelineEntries={timelineEntries} timelineLoading={timelineLoading}
-                participants={participants} allParts={allParts}
+                participants={participants} allParts={allParts} stats={stats}
             />
 
             {rightPanelOpen && (

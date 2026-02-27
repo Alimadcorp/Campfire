@@ -17,7 +17,7 @@ export function getDay() {
 export function nt(n) { return typeof n === "string" ? n : n?.text || ""; }
 
 export function parseMeta(pNotes) {
-    let rating = 0, color = "", game = "", team = "";
+    let rating = 0, color = "", game = "", team = "", inVenue = false, lastTransit = null;
     const customTags = [];
     (pNotes || []).forEach(n => {
         const t = nt(n);
@@ -26,8 +26,13 @@ export function parseMeta(pNotes) {
         else if (t.startsWith("🎮 GAME: ")) game = t.slice(9).trim();
         else if (t.startsWith("🏷️ TEAM ASSIGNED: ")) team = t.slice(19).trim();
         else if (t.startsWith("🔖 TAG: ")) customTags.push(t.slice(8).trim());
+        else if (t.startsWith("🚪 ")) {
+            const isArrival = t.includes("ARRIVED:");
+            inVenue = isArrival;
+            lastTransit = { type: isArrival ? 'in' : 'out', time: n.timestamp || n.time, text: t };
+        }
     });
-    return { rating, color, game, team, customTags };
+    return { rating, color, game, team, customTags, inVenue, lastTransit };
 }
 
 export function isMetaNote(text) {

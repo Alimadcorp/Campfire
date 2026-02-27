@@ -37,20 +37,41 @@ export default function LeftPanel({
     timelineEntries,
     timelineLoading,
     participants,
-    allParts
+    allParts,
+    stats
 }) {
     return (
         <div className="flex-1 flex flex-col min-w-0 border-r border-[#141416]">
             {/* Left header */}
             <div className="p-4 border-b border-white/5 bg-[#080808]/50 backdrop-blur-md shrink-0">
+                {/* Stats Summary */}
+                <div className="grid grid-cols-4 gap-2 mb-4">
+                    {[
+                        { label: "REGISTERED", val: stats.total, color: "text-white/40", bg: "bg-white/5" },
+                        { label: "SCANNED", val: stats.scanned, color: "text-blue-400", bg: "bg-blue-500/10" },
+                        { label: "IN VENUE", val: stats.inVenue, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+                        { label: "ON BREAK", val: stats.out, color: "text-amber-400", bg: "bg-amber-500/10" }
+                    ].map(s => (
+                        <div key={s.label} className={`${s.bg} border border-white/10 rounded-xl p-2.5 flex flex-col items-center justify-center gap-0.5 transition-all hover:scale-[1.02] shadow-sm relative group`}>
+                            <span className={`text-[0.5rem] font-black tracking-[0.2em] uppercase ${s.color}`}>{s.label}</span>
+                            <span className="text-[1.2rem] font-mono font-black tabular-nums text-white leading-none">{s.val}</span>
+                            {s.label === "IN VENUE" && (
+                                <span className="absolute -bottom-1 text-[0.4rem] font-bold text-white/20 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                                    {stats.vStaff} STAFF | {stats.vParts} GUESTS
+                                </span>
+                            )}
+                        </div>
+                    ))}
+                </div>
+
                 <div className="flex gap-1.5 mb-4 bg-white/5 p-1 rounded-xl border border-white/10">
                     <button onClick={() => setLeftMode("participants")}
                         className={`flex-1 text-[0.7rem] font-black py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all ${leftMode === "participants" ? "bg-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]" : "text-white/40 hover:text-white/80 hover:bg-white/5"}`}>
-                        <Users size={14} /> <span className="tracking-widest">ALL</span>
+                        <Users size={14} /> <span className="tracking-widest capitalize">DATABASE</span>
                     </button>
                     <button onClick={() => setLeftMode("venue")}
                         className={`flex-1 text-[0.7rem] font-black py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all ${leftMode === "venue" ? "bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]" : "text-white/40 hover:text-white/80 hover:bg-white/5"}`}>
-                        <CheckCircle size={14} /> <span className="tracking-widest">CHECKED IN</span>
+                        <CheckCircle size={14} /> <span className="tracking-widest uppercase">VENUE</span>
                     </button>
                     <button onClick={() => setLeftMode("teams")}
                         className={`flex-1 text-[0.7rem] font-black py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all ${leftMode === "teams" ? "bg-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]" : "text-white/40 hover:text-white/80 hover:bg-white/5"}`}>
