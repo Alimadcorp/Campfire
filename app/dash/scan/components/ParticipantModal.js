@@ -66,7 +66,7 @@ export default function ParticipantModal({
                 <div className="p-4 flex flex-col gap-4">
                     {/* Personal Info */}
                     <section>
-                        <h3 className="text-[0.55rem] font-black text-[#444] tracking-widest mb-1">PERSONAL INFORMATION</h3>
+                        <h3 className="text-[0.55rem] font-black text-[#444] mb-1">PERSONAL INFORMATION</h3>
                         <div className="grid grid-cols-2 gap-x-6">
                             <Row label="ID" value={modalP.id} mono />
                             <Row label="Display Name" value={modalP.displayName} />
@@ -96,7 +96,7 @@ export default function ParticipantModal({
 
                     {/* Event Info */}
                     <section>
-                        <h3 className="text-[0.55rem] font-black text-[#444] tracking-widest mb-1">EVENT DETAILS</h3>
+                        <h3 className="text-[0.55rem] font-black text-[#444] mb-1">EVENT DETAILS</h3>
                         <div className="grid grid-cols-2 gap-x-6">
                             <Row label="Shirt Size" value={modalP.shirtSize} />
                             <Row label="Dietary" value={modalP.dietaryRestrictions} redact={!canViewPII} />
@@ -108,13 +108,15 @@ export default function ParticipantModal({
                             <Row label="Volunteer" value={modalP.isVolunteer ? "Yes" : "No"} />
                             <Row label="Checked In" value={modalP.checkinCompleted ? "Yes" : "No"} />
                             <Row label="Disabled" value={modalP.disabled ? "Yes" : "No"} />
+                            <Row label="Checked in D1" value={modalP.scanned ? "Yes" : "No"} />
+                            <Row label="Checked in D2" value={modalP.scannedDay2 ? "Yes" : "No"} />
                         </div>
                     </section>
 
                     {/* Emergency Contacts */}
                     {canViewPII && (
                         <section>
-                            <h3 className="text-[0.55rem] font-black text-[#444] tracking-widest mb-1">EMERGENCY CONTACTS</h3>
+                            <h3 className="text-[0.55rem] font-black text-[#444] mb-1">EMERGENCY CONTACTS</h3>
                             {modalP.emergencyContact1Name ? (
                                 <div className="text-[0.65rem] text-white/60 bg-[#060608] rounded p-2 border border-[#141416]">
                                     <span className="text-white/80 font-bold">{modalP.emergencyContact1Name}</span> — {modalP.emergencyContact1Phone} ({modalP.emergencyContact1Relationship})
@@ -131,14 +133,14 @@ export default function ParticipantModal({
                     {/* Referral */}
                     {modalP.referralContext && (
                         <section>
-                            <h3 className="text-[0.55rem] font-black text-[#444] tracking-widest mb-1">REFERRAL CONTEXT</h3>
+                            <h3 className="text-[0.55rem] font-black text-[#444] mb-1">REFERRAL CONTEXT</h3>
                             <p className="text-[0.65rem] text-white/50 leading-relaxed bg-[#060608] rounded p-2 border border-[#141416] italic">"{modalP.referralContext}"</p>
                         </section>
                     )}
 
                     {/* Game Entry */}
                     <section>
-                        <h3 className="text-[0.55rem] font-black text-[#444] tracking-widest mb-1">GAME SUBMISSION</h3>
+                        <h3 className="text-[0.55rem] font-black text-[#444] mb-1">GAME SUBMISSION</h3>
                         {modalMeta.game && <p className="text-[0.65rem] text-emerald-400 mb-1">Current: <span className="text-white font-bold">{modalMeta.game}</span></p>}
                         <div className="flex gap-1">
                             <div className="flex items-center gap-1 flex-1 bg-black border border-[#222] rounded px-2">
@@ -154,7 +156,7 @@ export default function ParticipantModal({
 
                     {/* Team Assignment */}
                     <section>
-                        <h3 className="text-[0.55rem] font-black text-[#444] tracking-widest mb-1">TEAM ASSIGNMENT</h3>
+                        <h3 className="text-[0.55rem] font-black text-[#444] mb-1">TEAM ASSIGNMENT</h3>
                         {(modalMeta.team || modalP.team) && <p className="text-[0.65rem] text-blue-400 mb-1">Current: <span className="text-white font-bold">{modalMeta.team || modalP.team}</span></p>}
                         <div className="flex gap-1">
                             <div className="flex items-center gap-1 flex-1 bg-black border border-[#222] rounded px-2">
@@ -170,7 +172,7 @@ export default function ParticipantModal({
 
                     {/* Tags */}
                     <section>
-                        <h3 className="text-[0.55rem] font-black text-[#444] tracking-widest mb-1">TAGS</h3>
+                        <h3 className="text-[0.55rem] font-black text-[#444] mb-1">TAGS</h3>
                         {modalMeta.customTags?.length > 0 && (
                             <div className="flex flex-wrap gap-1 mb-1">
                                 {modalMeta.customTags.map((t, idx) => (
@@ -202,7 +204,7 @@ export default function ParticipantModal({
 
                     {/* Notes & Comments */}
                     <section>
-                        <h3 className="text-[0.55rem] font-black text-[#444] tracking-widest mb-1">NOTES & ACTIVITY ({modalVisible.length})</h3>
+                        <h3 className="text-[0.55rem] font-black text-[#444] mb-1">NOTES & ACTIVITY ({modalVisible.length})</h3>
                         <div className="flex gap-1 mb-2">
                             <input value={noteInputs[modalId] || ""} onChange={e => setNoteInputs(prev => ({ ...prev, [modalId]: e.target.value }))}
                                 onKeyDown={e => e.key === "Enter" && addNote(modalId, noteInputs[modalId])}

@@ -95,5 +95,5 @@ export async function GET(request) {
         lastUpdated: new Date().toISOString(),
       }),
     );
-  return Response("Success");
+  return new Response("Success");
 }

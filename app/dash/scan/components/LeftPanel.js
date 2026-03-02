@@ -48,7 +48,7 @@ export default function LeftPanel({
                 <div className="grid grid-cols-4 gap-2 mb-4">
                     {[
                         { label: "REGISTERED", val: stats.total, color: "text-white/40", bg: "bg-white/5" },
-                        { label: "SCANNED", val: stats.scanned, color: "text-blue-400", bg: "bg-blue-500/10" },
+                        { label: "CHECK-INS", val: stats.scanned, color: "text-blue-400", bg: "bg-blue-500/10" },
                         { label: "IN VENUE", val: stats.inVenue, color: "text-emerald-400", bg: "bg-emerald-500/10" },
                         { label: "ON BREAK", val: stats.out, color: "text-amber-400", bg: "bg-amber-500/10" }
                     ].map(s => (
@@ -140,7 +140,6 @@ export default function LeftPanel({
                                 Clear All
                             </button>
                         ) : null}
-                        <span className="text-[0.65rem] font-black text-white/20 uppercase tracking-widest">{pageData.length} visible</span>
                     </div>
                 </div>
 

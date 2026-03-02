@@ -103,6 +103,10 @@ export async function GET() {
     shirtSizes: signupsData.map((s) => s.shirtSize).filter(Boolean),
     accommodations: signupsData.map((s) => s.additionalAccommodations).filter(Boolean),
     finalCheckins: final,
+    scanned: signupsData.filter((s) => s.scanned).length,
+    pendingScanned: signupsData.filter((s) => s.pendingScanned).length,
+    scannedDay2: signupsData.filter((s) => s.scannedDay2).length,
+    pendingScannedDay2: signupsData.filter((s) => s.pendingScannedDay2).length,
   };
   filtered.participants = participants;
   filtered.lastUpdated = allData.lastUpdated;

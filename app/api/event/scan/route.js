@@ -1,7 +1,7 @@
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    const day = searchParams.get("day");
+    const day = 2;
     if (!id || !day) return new Response("Missing parameters", { status: 400 });
     const data = await fetch(
         `https://cockpit.hackclub.com/api/events/rec5bXfCOC93cGPBe/scan`,

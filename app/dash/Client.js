@@ -16,6 +16,7 @@ import {
   Shirt,
   Bed,
   CheckCircle2,
+  ScanLine,
 } from "lucide-react";
 import { format } from "date-fns";
 import StatusViewer from "@/components/spy";
@@ -391,6 +392,42 @@ export default function DashboardClient({ user, data }) {
                 }
                 color="bg-blue-600"
                 subtitle="With CNICs"
+              />
+              <InfoCard
+                icon={ScanLine}
+                title="Scanned Day 1"
+                value={
+                  eventData?.participants?.scanned !== undefined ? `${eventData.participants.scanned}` : "0"
+                }
+                color="bg-purple-600"
+                subtitle="In building"
+              />
+              <InfoCard
+                icon={ScanLine}
+                title="Pending Scanned D1"
+                value={
+                  eventData?.participants?.pendingScanned !== undefined ? `${eventData.participants.pendingScanned}` : "0"
+                }
+                color="bg-yellow-600"
+                subtitle="Waiting for scan"
+              />
+              <InfoCard
+                icon={ScanLine}
+                title="Scanned Day 2"
+                value={
+                  eventData?.participants?.scannedDay2 !== undefined ? `${eventData.participants.scannedDay2}` : "0"
+                }
+                color="bg-purple-500"
+                subtitle="In building"
+              />
+              <InfoCard
+                icon={ScanLine}
+                title="Pending Scanned D2"
+                value={
+                  eventData?.participants?.pendingScannedDay2 !== undefined ? `${eventData.participants.pendingScannedDay2}` : "0"
+                }
+                color="bg-yellow-500"
+                subtitle="Waiting for scan"
               />
             </div>
             <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
