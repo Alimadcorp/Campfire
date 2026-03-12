@@ -1,6 +1,24 @@
 Deployed by Vercel to https://campfire.alimad.co
 
-This is an organizers portal
+This `was` an organizer's portal
+
+There are two main things here, first, the `quickstream` folder contains a Flutter app that scans QR codes and streams them to a websocket. `socket` contains the recieving socket which forwards them to listeners. The rest of the folders and files are a nextjs app, and route `/dash/scan` is the listener that connects to the socket.
+
+This project was partially vibe coded using Googol Antigravity :]
+
+(Now depracated and unavailable, but here are some working screenshots of the thing:)
+
+[Heres a working video of QuickStream](https://static.alimad.co/hehe.mov)
+
+<div align="center">
+
+<img src="https://github.com/user-attachments/assets/8888e031-6b86-453e-ae4a-f3561217bed0" width="900"/>
+
+<img src="https://github.com/user-attachments/assets/76d87c9e-2137-4780-8c74-2801f8816dfc" width="900"/>
+
+<img src="https://github.com/user-attachments/assets/97738bb0-999e-405d-a63b-d7f11a954141" width="500"/>
+
+</div>
 
 ---
 
@@ -81,5 +99,9 @@ This is an organizers portal
   - the participants table. only visible to PoC
 
 `/dash/timetable`
+
+`/dash/scan`
+
+  - for scanning in the particopants. works together with `quickstream`
 
   - hmmmmmmm
