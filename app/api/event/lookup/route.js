@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  token: process.env.UPSTASH_REDIS_REST_URL_TOKEN,
 });
 
 export async function GET(request) {
@@ -33,6 +33,7 @@ export async function GET(request) {
           time: signup.createdTime,
           disabled: signup.disabled,
           volunteer: signup.isVolunteer,
+          checkedin: signup.checkinCompleted
         };
       }
       output.results.push({
@@ -40,6 +41,7 @@ export async function GET(request) {
         time: signup.createdTime,
         disabled: signup.disabled,
         volunteer: signup.isVolunteer,
+        checkedin: signup.checkinCompleted
       });
     }
   }

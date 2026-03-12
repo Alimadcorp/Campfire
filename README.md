@@ -42,6 +42,8 @@ This project was partially vibe coded using Googol Antigravity :]
 
 4. next build
 
+5. Setup a cronjob to call `/cron?pwd=<process.env.NEXT_PUBLIC_CRON_SECRET>` every couple minutes
+
 ---
 
 ## App Routes

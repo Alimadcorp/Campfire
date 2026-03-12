@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "start": "node index.js"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "ioredis": "^5.9.3",
+    "ws": "^8.19.0"
+  }
+}

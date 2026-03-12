@@ -11,6 +11,12 @@ import {
   TrendingUp,
   RefreshCw,
   LucideLoader2,
+  CheckCircle,
+  Utensils,
+  Shirt,
+  Bed,
+  CheckCircle2,
+  ScanLine,
 } from "lucide-react";
 import { format } from "date-fns";
 import StatusViewer from "@/components/spy";
@@ -23,6 +29,7 @@ import CountdownTimer from "@/components/countdown";
 import Lookup from "@/components/lookup";
 import Chat from "@/components/chat";
 import Referrals from "@/components/referrals";
+import ListStats from "@/components/list-stats";
 
 export default function DashboardClient({ user, data }) {
   const [isDismissed, setIsDismissed] = useState(false);
@@ -263,7 +270,7 @@ export default function DashboardClient({ user, data }) {
                               ? "Rejected" + ` ${timeago(status.time)}`
                               : status.volunteer
                                 ? "Signed Up as Organizer" +
-                                  ` ${timeago(status.time)}`
+                                ` ${timeago(status.time)}`
                                 : "Signed Up" + ` ${timeago(status.time)}`
                             : "Not Signed Up!"}
 
@@ -290,7 +297,7 @@ export default function DashboardClient({ user, data }) {
                         NEW
                       </span>
                       <p className="font-primary text-red-900 text-xl font-black italic tracking-wide group-hover:underline decoration-wavy decoration-red-600">
-                        SPY ON THE PoC, NOW!
+                        SPY ON YOUR PoC, {eventData.poc.name} NOW!
                       </p>
                       <span className="bg-red-600 text-white text-sm font-black px-2 py-1 rounded -rotate-3 animate-pulse">
                         HOT!
@@ -320,7 +327,7 @@ export default function DashboardClient({ user, data }) {
               </div>
             </div>
 
-            <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <InfoCard
                 icon={Calendar}
                 title="Format"
@@ -345,6 +352,17 @@ export default function DashboardClient({ user, data }) {
                 subtitle={eventData?.venue?.addressCity}
               />
               <InfoCard
+                icon={TrendingUp}
+                title="Last signup"
+                value={
+                  eventData?.participants?.mostRecent
+                    ? timeago(eventData.participants.mostRecent)
+                    : "Active"
+                }
+                color="bg-secondary"
+                subtitle={"by " + eventData?.participants?.mostRecentName}
+              />
+              <InfoCard
                 icon={Users}
                 title="Signups"
                 value={
@@ -358,15 +376,58 @@ export default function DashboardClient({ user, data }) {
                 }
               />
               <InfoCard
-                icon={TrendingUp}
-                title="Last signup"
+                icon={CheckCircle}
+                title="Checked In"
                 value={
-                  eventData?.participants?.mostRecent
-                    ? timeago(eventData.participants.mostRecent)
-                    : "Active"
+                  eventData?.participants?.checkins !== undefined ? `${eventData.participants.checkins}` : "0"
                 }
-                color="bg-secondary"
-                subtitle={"by " + eventData?.participants?.mostRecentName}
+                color="bg-green-600"
+                subtitle="Hehe"
+              />
+              <InfoCard
+                icon={CheckCircle2}
+                title="Final Checkins"
+                value={
+                  eventData?.participants?.finalCheckins !== undefined ? `${eventData.participants.finalCheckins}` : "0"
+                }
+                color="bg-blue-600"
+                subtitle="With CNICs"
+              />
+              <InfoCard
+                icon={ScanLine}
+                title="Scanned Day 1"
+                value={
+                  eventData?.participants?.scanned !== undefined ? `${eventData.participants.scanned}` : "0"
+                }
+                color="bg-purple-600"
+                subtitle="In building"
+              />
+              <InfoCard
+                icon={ScanLine}
+                title="Pending Scanned D1"
+                value={
+                  eventData?.participants?.pendingScanned !== undefined ? `${eventData.participants.pendingScanned}` : "0"
+                }
+                color="bg-yellow-600"
+                subtitle="Waiting for scan"
+              />
+              <InfoCard
+                icon={ScanLine}
+                title="Scanned Day 2"
+                value={
+                  eventData?.participants?.scannedDay2 !== undefined ? `${eventData.participants.scannedDay2}` : "0"
+                }
+                color="bg-purple-500"
+                subtitle="In building"
+              />
+              <InfoCard
+                icon={ScanLine}
+                title="Pending Scanned D2"
+                value={
+                  eventData?.participants?.pendingScannedDay2 !== undefined ? `${eventData.participants.pendingScannedDay2}` : "0"
+                }
+                color="bg-yellow-500"
+                subtitle="Waiting for scan"
               />
             </div>
             <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -384,6 +445,9 @@ export default function DashboardClient({ user, data }) {
                 eventData={eventData}
               />
               <Referrals data={eventData?.participants?.referrals} />
+              <ListStats title="Dietary Restrictions" icon={Utensils} data={eventData?.participants?.dietaryRestrictions} />
+              <ListStats title="Shirt Sizes" icon={Shirt} data={eventData?.participants?.shirtSizes} />
+              <ListStats title="Additional Accommodations" icon={Bed} data={eventData?.participants?.accommodations} />
             </div>
 
             <div className="w-full max-w-6xl bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 hover:backdrop-blur-none backdrop-blur-sm transition-all duration-300 cursor-default group">
@@ -395,7 +459,7 @@ export default function DashboardClient({ user, data }) {
                   href={
                     eventData?.formLink ||
                     "https://forms.hackclub.com/campfire-signup?event=" +
-                      process.env.NEXT_PUBLIC_EVENT_ID
+                    process.env.NEXT_PUBLIC_EVENT_ID
                   }
                   target="_blank"
                   rel="noopener noreferrer"

@@ -1,5 +1,5 @@
 "use client";
-import { LucideUserCog2, Search, Trash, User, User2, UserRoundX } from "lucide-react";
+import { LucideUserCog2, Search, CheckCircle, User2, UserRoundX } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { format } from "timeago.js";
 
@@ -104,7 +104,12 @@ export default function Lookup() {
                 {result.disabled ? (
                   <UserRoundX size={20} className="text-red-400" />
                 ) : result.volunteer ? (
-                  <LucideUserCog2 size={20} className="text-indigo-400" />
+                  <span className="flex items-center gap-1">
+                    <LucideUserCog2 size={20} className="text-indigo-400" />
+                    {result.checkedin ? <CheckCircle size={20} className="text-green-400" /> : null}
+                  </span>
+                ) : result.checkedin ? (
+                  <CheckCircle size={20} className="text-green-400" />
                 ) : (
                   <User2 size={20} className="text-cyan-400" />
                 )}

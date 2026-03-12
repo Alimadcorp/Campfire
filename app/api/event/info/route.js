@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  token: process.env.UPSTASH_REDIS_REST_URL_TOKEN,
 });
 
 export async function GET() {
@@ -79,6 +79,13 @@ export async function GET() {
       }
     }
   });
+  let uniqueCnic = new Set();
+  allData.fillout.forEach((signup) => {
+    if (signup.cnic) {
+      uniqueCnic.add(signup.cnic);
+    }
+  });
+  let final = uniqueCnic.size;
   let participants = {
     total: signupsData.length,
     deleted,
@@ -91,6 +98,15 @@ export async function GET() {
     mostRecentName: mostRecentName.trim(),
     signupTimes: signupsData.map((s) => s.createdTime),
     referrals: signupsData.map((s) => s.referralContext),
+    checkins: signupsData.filter((s) => s.checkinCompleted).length,
+    dietaryRestrictions: signupsData.map((s) => s.dietaryRestrictions).filter(Boolean),
+    shirtSizes: signupsData.map((s) => s.shirtSize).filter(Boolean),
+    accommodations: signupsData.map((s) => s.additionalAccommodations).filter(Boolean),
+    finalCheckins: final,
+    scanned: signupsData.filter((s) => s.scanned).length,
+    pendingScanned: signupsData.filter((s) => s.pendingScanned).length,
+    scannedDay2: signupsData.filter((s) => s.scannedDay2).length,
+    pendingScannedDay2: signupsData.filter((s) => s.pendingScannedDay2).length,
   };
   filtered.participants = participants;
   filtered.lastUpdated = allData.lastUpdated;

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  token: process.env.UPSTASH_REDIS_REST_URL_TOKEN,
 });
 
 export async function GET() {
@@ -11,7 +11,7 @@ export async function GET() {
   if (!session || !session.user) {
     return Response.json({ error: "Not authenticated." }, { status: 401 });
   }
-  const allowedSlackIds = process.env.ADWIN.split(",");
+  const allowedSlackIds = ["U08LQFRBL6S", "U07UGRYER5G"]//, "U0A9FR997HU", "U09DRCKD0LT", "U09DTPWN726", "U07UGRYER5G", "U08RS7AEA77", "U0AAKAT78TD"]
   if (!allowedSlackIds.includes(session.user.slackId)) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
