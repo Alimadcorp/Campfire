@@ -254,7 +254,7 @@ export default function TablePage() {
     const matchesFilters =
       (filters.volunteer === null || p.isVolunteer === filters.volunteer) &&
       (filters.disabled === null || p.disabled === filters.disabled) &&
-      (filters.cin === null || p.checkinCompleted === filters.cin) &&
+      (filters.cin === null || p.scannedDay2 === filters.cin) &&
       (filters.fillout === null || p.hasFillout === filters.fillout) &&
       (filters.pending === null ||
         (filters.pending === true &&
@@ -350,7 +350,7 @@ export default function TablePage() {
               .join(" ");
           else if (col === "ref") val = p.referralContext;
           else if (col === "mark") val = marks[p.id] ? "1" : "0";
-          else if (col === "cin") val = p.checkinCompleted ? "1" : "0";
+          else if (col === "cin") val = p.scannedDay2 ? "1" : "0";
           else if (col === "shirt") val = p.shirtSize;
           else if (col === "diet") val = p.dietaryRestrictions;
           else if (col === "accom") val = p.additionalAccommodations;
@@ -388,7 +388,7 @@ export default function TablePage() {
     });
 
     const withCnic = sorted.filter(p => p.cnic);
-    const checkedNoCnic = sorted.filter(p => !p.cnic && p.checkinCompleted);
+    const checkedNoCnic = sorted.filter(p => !p.cnic && p.scannedDay2);
 
     const seenCnics = new Map();
     const duplicates = [];
@@ -1020,7 +1020,7 @@ export default function TablePage() {
                   <tr
                     key={p.id}
                     className={`bg-black border-b border-white/5 transition-all duration-150 hover:bg-white/10 cursor-text ${resendState[p.id] === 'pending' ? 'bg-yellow-900/40' :
-                      p.checkinCompleted ? "bg-green-500/5" : ""
+                      p.scannedDay2 ? "bg-green-500/5" : ""
                       }`}
                   >
                     <td className="px-2 py-2 text-xs font-bold text-white/50">
@@ -1183,8 +1183,8 @@ export default function TablePage() {
                     )}
                     {visibleCols.cin && (
                       <td className="px-2 py-2 text-center">
-                        <span className={`px-2 py-1 rounded font-bold text-[10px] ${p.checkinCompleted ? "bg-green-700 text-white" : "bg-white/5 text-white/20"}`}>
-                          {p.checkinCompleted ? "CIN" : "OUT"}
+                        <span className={`px-2 py-1 rounded font-bold text-[10px] ${p.scannedDay2 ? "bg-green-700 text-white" : "bg-white/5 text-white/20"}`}>
+                          {p.scannedDay2 ? "CIN" : "OUT"}
                         </span>
                       </td>
                     )}
